@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL") // stored in .env file
+}
+
+model Car {
+  id             Int      @id @default(autoincrement())
+  rego           String
+  carModel       String
+  driverName     String
+  rentPerWeek    Float?
+  receipt        String?
+  rentedDate     String?
+  amountReceiver Float?
+  expense        Float?
+  carNumber      String
+  rented         Boolean
+  description    String?
+  createdAt      DateTime @default(now())
+}
+
+model Drivers {
+  id          Int     @id @default(autoincrement())
+  name        String
+  phoneNumber String?
+  idNumber    String?
+  adress      String?
+}
