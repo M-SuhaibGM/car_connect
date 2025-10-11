@@ -99,7 +99,7 @@ export default function AvailableCarsPage() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem
-                      onClick={() => router.push(`/editor/${car.id}/available`)}
+                      onClick={() => router.push(`/editor/${car.id}/?page=available`)}
                     >
                       Edit
                     </DropdownMenuItem>

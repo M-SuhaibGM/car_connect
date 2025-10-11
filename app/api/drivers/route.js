@@ -15,7 +15,6 @@ export async function GET() {
 export async function POST(req) {
   try {
     const body = await req.json();
-    console.log(body)
     const driver = await prisma.drivers.create({ data: body });
     return NextResponse.json(driver);
   } catch (error) {

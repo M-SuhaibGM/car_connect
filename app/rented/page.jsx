@@ -96,6 +96,7 @@ export default function CarsPage() {
               <TableHead className="font-bold">Model</TableHead>
               <TableHead className="font-bold">Rego</TableHead>
               <TableHead className="font-bold">Driver</TableHead>
+              <TableHead className="font-bold">DriverId</TableHead>
               <TableHead className="font-bold">Rent (Per Week)</TableHead>
               <TableHead className="font-bold">Receipt</TableHead>
               <TableHead className="font-bold">Received</TableHead>
@@ -113,6 +114,7 @@ export default function CarsPage() {
                   <TableCell>{car.carModel ?? "-"}</TableCell>
                   <TableCell>{car.rego ?? "-"}</TableCell>
                   <TableCell>{car.driverName ?? "-"}</TableCell>
+                  <TableCell>{car.driverId ?? "-"}</TableCell>
                   <TableCell>${car.rentPerWeek ?? 0}</TableCell>
                   <TableCell>{car.receipt ?? "-"}</TableCell>
                   <TableCell>${car.amountReceiver ?? 0}</TableCell>
@@ -129,7 +131,7 @@ export default function CarsPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start">
                         <DropdownMenuItem
-                          onClick={() => router.push(`/editor/${car.id}/rented`)}
+                          onClick={() => router.push(`/editor/${car.id}/?page=rented`)}
                         >
                           Edit
                         </DropdownMenuItem>

@@ -31,10 +31,10 @@ export default function LandingPage() {
       </header>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-6">
+      <footer className="bg-gray-500 text-white py-6">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-6">
           {/* Brand */}
-          <p className="text-gray-400 mb-4 md:mb-0">
+          <p className="text-gray-100 mb-4 md:mb-0">
             © {new Date().getFullYear()} NexaRent | Powered by Rao Waleed Nisar
           </p>
 

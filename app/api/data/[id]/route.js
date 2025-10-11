@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
-// ✅ GET single car by ID
-export async function GET(req, context) {
+/**
+ * ✅ GET single car by ID
+ */
+export async function GET(req, { params }) {
   try {
-    const { params } = await context; // ⬅️ await params
-    const car = await prisma.car.findUnique({
-      where: { id: parseInt(params.id) },
-    });
+    const { id } = await params; // ✅ safely await context
+
+    const car = await prisma.car.findUnique({ where: { id } });
 
     if (!car) {
       return NextResponse.json({ error: "Car not found" }, { status: 404 });
@@ -20,26 +21,29 @@ export async function GET(req, context) {
   }
 }
 
-// ✅ UPDATE car by ID
-export async function PUT(req, context) {
+
+export async function PUT(req, { params }) {
   try {
-    const { params } = await context; // ⬅️ await params
+    const { id } = await params;
     const body = await req.json();
 
     const updatedCar = await prisma.car.update({
-      where: { id: parseInt(params.id) },
+      where: { id },
       data: {
         rego: body.rego,
         carModel: body.carModel,
         driverName: body.driverName,
-        rentPerWeek: parseFloat(body.rentPerWeek) || null,
+        rentPerWeek: body.rentPerWeek ? parseFloat(body.rentPerWeek) : null,
         receipt: body.receipt,
-        amountReceiver: parseFloat(body.amountReceiver) || null,
-        expense: parseFloat(body.expense) || null,
+        amountReceiver: body.amountReceiver
+          ? parseFloat(body.amountReceiver)
+          : null,
+        expense: body.expense ? parseFloat(body.expense) : null,
         description: body.description,
         carNumber: body.carNumber,
         rented: body.rented,
         rentedDate: body.rentedDate,
+        driverId: body.driverId,
       },
     });
 
@@ -50,13 +54,12 @@ export async function PUT(req, context) {
   }
 }
 
-// ✅ DELETE car by ID
-export async function DELETE(req, context) {
+
+export async function DELETE(req, { params }) {
   try {
-    const { params } = await context; // ⬅️ await params
-    await prisma.car.delete({
-      where: { id: parseInt(params.id) },
-    });
+    const { id } = await params;
+
+    await prisma.car.delete({ where: { id } });
 
     return NextResponse.json({ message: "Car deleted successfully" });
   } catch (error) {

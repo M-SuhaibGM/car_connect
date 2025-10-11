@@ -14,14 +14,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 export default function EditorPage() {
   const { id } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const page = searchParams.get("page");
 
   const [formData, setFormData] = useState({
     rego: "",
+    driverId: "",
     carModel: "",
     driverName: "",
     rentPerWeek: "",
@@ -33,24 +36,26 @@ export default function EditorPage() {
     rented: false,
     rentedDate: "",
   });
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  // Fetch car data
   useEffect(() => {
     async function fetchCar() {
       try {
         const res = await axios.get(`/api/data/${id}`);
         const car = res.data;
 
-        // normalize nulls → empty string
         setFormData({
           rego: car.rego || "",
+          driverId: car.driverId || "",
           carModel: car.carModel || "",
           driverName: car.driverName || "",
-          rentPerWeek: car.rentPerWeek ?? "",       // number field
+          rentPerWeek: car.rentPerWeek ?? "",
           receipt: car.receipt || "",
-          amountReceiver: car.amountReceiver ?? "", // number field
-          expense: car.expense ?? "",               // number field
+          amountReceiver: car.amountReceiver ?? "",
+          expense: car.expense ?? "",
           description: car.description || "",
           carNumber: car.carNumber || "",
           rented: car.rented ?? false,
@@ -63,10 +68,11 @@ export default function EditorPage() {
         setLoading(false);
       }
     }
+
     if (id) fetchCar();
   }, [id]);
 
-
+  // Handle input change
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -75,13 +81,14 @@ export default function EditorPage() {
     });
   };
 
+  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
       await axios.put(`/api/data/${id}`, formData);
       toast.success("Car updated successfully!");
-      router.push("/available"); // redirect back
+      router.push(`/${page}`); // redirect back to the original page (e.g. dashboard)
     } catch (error) {
       console.error("Update error:", error);
       toast.error("Failed to update car.");
@@ -106,6 +113,7 @@ export default function EditorPage() {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
+        objectFit: "cover",
         minHeight: "90vh",
         width: "100%",
       }}
@@ -116,11 +124,13 @@ export default function EditorPage() {
             Edit Car Details
           </CardTitle>
         </CardHeader>
+
         <CardContent>
           <form
             onSubmit={handleSubmit}
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
+            {/* Registration */}
             <div>
               <Label htmlFor="rego">Registration No.</Label>
               <Input
@@ -129,9 +139,11 @@ export default function EditorPage() {
                 value={formData.rego}
                 onChange={handleChange}
                 required
+                className="max-w-sm"
               />
             </div>
 
+            {/* Car Model */}
             <div>
               <Label htmlFor="carModel">Car Model</Label>
               <Input
@@ -140,9 +152,11 @@ export default function EditorPage() {
                 value={formData.carModel}
                 onChange={handleChange}
                 required
+                className="max-w-sm"
               />
             </div>
 
+            {/* Driver Name */}
             <div>
               <Label htmlFor="driverName">Driver Name</Label>
               <Input
@@ -150,10 +164,23 @@ export default function EditorPage() {
                 name="driverName"
                 value={formData.driverName}
                 onChange={handleChange}
-                required
+                className="max-w-sm"
               />
             </div>
 
+            {/* Driver ID */}
+            <div>
+              <Label htmlFor="driverId">Driver ID</Label>
+              <Input
+                id="driverId"
+                name="driverId"
+                value={formData.driverId}
+                onChange={handleChange}
+                className="max-w-sm"
+              />
+            </div>
+
+            {/* Rent Per Week */}
             <div>
               <Label htmlFor="rentPerWeek">Rent Per Week</Label>
               <Input
@@ -162,9 +189,12 @@ export default function EditorPage() {
                 type="number"
                 value={formData.rentPerWeek}
                 onChange={handleChange}
+                required
+                className="max-w-sm"
               />
             </div>
 
+            {/* Receipt */}
             <div>
               <Label htmlFor="receipt">Receipt</Label>
               <Input
@@ -172,21 +202,24 @@ export default function EditorPage() {
                 name="receipt"
                 value={formData.receipt}
                 onChange={handleChange}
-                required
+                className="max-w-sm"
               />
             </div>
 
+            {/* Amount Receiver */}
             <div>
-              <Label htmlFor="amountReceiver">Amount Receiver</Label>
+              <Label htmlFor="amountReceiver">Amount Received</Label>
               <Input
                 id="amountReceiver"
                 name="amountReceiver"
                 type="number"
                 value={formData.amountReceiver}
                 onChange={handleChange}
+                className="max-w-sm"
               />
             </div>
 
+            {/* Expense */}
             <div>
               <Label htmlFor="expense">Expense</Label>
               <Input
@@ -195,9 +228,11 @@ export default function EditorPage() {
                 type="number"
                 value={formData.expense}
                 onChange={handleChange}
+                className="max-w-sm"
               />
             </div>
 
+            {/* Car Number */}
             <div>
               <Label htmlFor="carNumber">Car Number</Label>
               <Input
@@ -206,9 +241,11 @@ export default function EditorPage() {
                 value={formData.carNumber}
                 onChange={handleChange}
                 required
+                className="max-w-sm"
               />
             </div>
 
+            {/* Rented Checkbox */}
             <div className="flex items-center space-x-2">
               <input
                 id="rented"
@@ -221,26 +258,31 @@ export default function EditorPage() {
               <Label htmlFor="rented">Rented?</Label>
             </div>
 
+            {/* Rented Date */}
             <div>
               <Label htmlFor="rentedDate">Rented Date</Label>
               <Input
                 id="rentedDate"
                 name="rentedDate"
-                value={formData.rentedDate || ""}
+                value={formData.rentedDate}
                 onChange={handleChange}
+                className="max-w-sm"
               />
             </div>
 
+            {/* Description */}
             <div className="md:col-span-2">
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
                 name="description"
-                value={formData.description || ""}
+                value={formData.description}
                 onChange={handleChange}
+                className="max-w-2xl"
               />
             </div>
 
+            {/* Submit */}
             <div className="md:col-span-2 flex justify-center">
               <Button
                 type="submit"

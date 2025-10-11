@@ -18,7 +18,8 @@ export async function POST(req) {
         description: body.description,
         carNumber: body.carNumber,
         rented: Boolean(body.rented),
-        rentedDate: body.rentedDate
+        rentedDate: body.rentedDate,
+        driverId: body.driverId
       },
     });
 

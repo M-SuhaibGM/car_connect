@@ -3,15 +3,16 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL") // stored in .env file
+  provider = "mongodb"
+  url      = env("DATABASE_URL") // e.g. mongodb+srv://user:pass@cluster/dbname
 }
 
 model Car {
-  id             Int      @id @default(autoincrement())
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  driverId       String
+  driverName     String
   rego           String
   carModel       String
-  driverName     String
   rentPerWeek    Float?
   receipt        String?
   rentedDate     String?
@@ -24,7 +25,7 @@ model Car {
 }
 
 model Drivers {
-  id          Int     @id @default(autoincrement())
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   phoneNumber String?
   idNumber    String?

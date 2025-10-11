@@ -18,6 +18,7 @@ import { toast } from "sonner";
 export default function EditorPage() {
   const [formData, setFormData] = useState({
     rego: "",
+    driverId: "",
     carModel: "",
     driverName: "",
     rentPerWeek: "",
@@ -28,6 +29,7 @@ export default function EditorPage() {
     carNumber: "",
     rented: false, // boolean
     rentedDate: "",
+
   });
   const [loading, setLoading] = useState(false);
 
@@ -51,6 +53,7 @@ export default function EditorPage() {
       // clear form
       setFormData({
         rego: "",
+        driverId: "",
         carModel: "",
         driverName: "",
         rentPerWeek: "",
@@ -61,6 +64,7 @@ export default function EditorPage() {
         carNumber: "",
         rented: false,
         rentedDate: "",
+
       });
     } catch (error) {
       console.error("Submission error:", error);
@@ -125,7 +129,16 @@ export default function EditorPage() {
                 name="driverName"
                 value={formData.driverName}
                 onChange={handleChange}
-                required
+                className="max-w-sm"
+              />
+            </div>
+            <div >
+              <Label htmlFor="driverId">Driver ID</Label>
+              <Input
+                id="driverId"
+                name="driverId"
+                checked={formData.driverId}
+                onChange={handleChange}
                 className="max-w-sm"
               />
             </div>
@@ -150,7 +163,6 @@ export default function EditorPage() {
                 name="receipt"
                 value={formData.receipt}
                 onChange={handleChange}
-                required
                 className="max-w-sm"
               />
             </div>
@@ -212,6 +224,7 @@ export default function EditorPage() {
                 className="max-w-sm"
               />
             </div>
+
 
             <div className="md:col-span-2">
               <Label htmlFor="description">Description</Label>
