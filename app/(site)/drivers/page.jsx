@@ -139,7 +139,7 @@ export default function DriversPage() {
   };
 
   return (
-    <div className="p-6 min-h-[90vh] bg-gray-100" style={{
+    <div className="p-6 min-h-[88.8vh]  bg-gray-100" style={{
       backgroundImage: "url('/car.jpg')",
       backgroundSize: "cover",
       backgroundPosition: "center",
@@ -160,7 +160,7 @@ export default function DriversPage() {
       </div>
 
       {/* Drivers Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-2   max-h-[70vh]  overflow-y-scroll">
         {drivers.map((driver) => (
           <Card
             key={driver.id}

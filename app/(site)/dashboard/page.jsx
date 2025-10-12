@@ -22,11 +22,14 @@ import {
 import { Layout, LayoutDashboard, Loader2, } from "lucide-react";
 import { toast } from "sonner";
 import AllCars from "../components/AllCars";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
     const [cars, setCars] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    const { data: session, status } = useSession();
+    const router = useRouter();
     // ✅ Fetch all cars
     useEffect(() => {
         async function fetchData() {

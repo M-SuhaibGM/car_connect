@@ -1,7 +1,18 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function GET(req, { params }) {
+
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      { success: false, error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
   const { id } = await params;
   const driver = await prisma.drivers.findUnique({
     where: { id },
@@ -10,6 +21,16 @@ export async function GET(req, { params }) {
 }
 
 export async function PUT(req, { params }) {
+
+
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      { success: false, error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
   const { id } = await params;
   const body = await req.json();
   const driver = await prisma.drivers.update({
@@ -20,6 +41,16 @@ export async function PUT(req, { params }) {
 }
 
 export async function DELETE(req, { params }) {
+
+
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json(
+      { success: false, error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
   const { id } = await params;
   await prisma.drivers.delete({
     where: { id },

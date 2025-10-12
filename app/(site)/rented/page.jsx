@@ -66,32 +66,36 @@ export default function CarsPage() {
     );
   }
 
-  return (
-    <div className="min-h-[90vh] bg-gray-100 p-6  " style={{
+return (
+  <div
+    className="min-h-[88.8vh] bg-gray-100 p-6 flex flex-col"
+    style={{
       backgroundImage: "url('/car.jpg')",
       backgroundSize: "cover",
       backgroundPosition: "center",
       backgroundRepeat: "no-repeat",
-      minHeight: "90vh",
-      width: "100%",
-    }}>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-white">Rented Cars 🚗</h1>
-        <div className="relative w-64">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-          <Input
-            type="text"
-            placeholder="Search by Car Number..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-8  bg-white"
-          />
-        </div>
-      </div>
+    }}
+  >
+    <div className="flex items-center justify-between mb-6">
+      <h1 className="text-3xl font-bold text-white">Rented Cars 🚗</h1>
 
-      <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
-        <Table>
-          <TableHeader>
+      <div className="relative w-64">
+        <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+        <Input
+          type="text"
+          placeholder="Search by Car Number..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-8 bg-white"
+        />
+      </div>
+    </div>
+
+    {/* Table Container */}
+    <div className="flex-1 bg-white shadow-lg rounded-lg  max-h-[70vh] overflow-hidden">
+      <div className="overflow-y-auto max-h-[70vh]">
+        <Table className="w-full">
+          <TableHeader className="sticky top-0 bg-gray-100 z-10">
             <TableRow>
               <TableHead className="font-bold">Model</TableHead>
               <TableHead className="font-bold">Rego</TableHead>
@@ -104,9 +108,10 @@ export default function CarsPage() {
               <TableHead className="font-bold">Description</TableHead>
               <TableHead className="font-bold">Rented Date</TableHead>
               <TableHead className="font-bold">Car Number</TableHead>
-              <TableHead className="font-bold" />
+              <TableHead />
             </TableRow>
           </TableHeader>
+
           <TableBody>
             {filteredCars.length > 0 ? (
               filteredCars.map((car) => (
@@ -131,7 +136,9 @@ export default function CarsPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start">
                         <DropdownMenuItem
-                          onClick={() => router.push(`/editor/${car.id}/?page=rented`)}
+                          onClick={() =>
+                            router.push(`/editor/${car.id}/?page=rented`)
+                          }
                         >
                           Edit
                         </DropdownMenuItem>
@@ -148,7 +155,10 @@ export default function CarsPage() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={11} className="text-center py-6 text-gray-500">
+                <TableCell
+                  colSpan={12}
+                  className="text-center py-6 text-gray-500"
+                >
                   No cars found matching "{search}"
                 </TableCell>
               </TableRow>
@@ -157,5 +167,7 @@ export default function CarsPage() {
         </Table>
       </div>
     </div>
-  );
+  </div>
+);
+
 }

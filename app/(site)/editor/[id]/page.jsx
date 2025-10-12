@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -14,8 +14,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 export default function EditorPage() {
+  const { id } = useParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const page = searchParams.get("page");
+
   const [formData, setFormData] = useState({
     rego: "",
     driverId: "",
@@ -27,52 +33,77 @@ export default function EditorPage() {
     expense: "",
     description: "",
     carNumber: "",
-    rented: false, // boolean
+    rented: false,
     rentedDate: "",
-
   });
-  const [loading, setLoading] = useState(false);
 
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  // Fetch car data
+  useEffect(() => {
+    async function fetchCar() {
+      try {
+        const res = await axios.get(`/api/data/${id}`);
+        const car = res.data;
+
+        setFormData({
+          rego: car.rego || "",
+          driverId: car.driverId || "",
+          carModel: car.carModel || "",
+          driverName: car.driverName || "",
+          rentPerWeek: car.rentPerWeek ?? "",
+          receipt: car.receipt || "",
+          amountReceiver: car.amountReceiver ?? "",
+          expense: car.expense ?? "",
+          description: car.description || "",
+          carNumber: car.carNumber || "",
+          rented: car.rented ?? false,
+          rentedDate: car.rentedDate || "",
+        });
+      } catch (error) {
+        console.error("Error fetching car:", error);
+        toast.error("Failed to load car data");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (id) fetchCar();
+  }, [id]);
+
+  // Handle input change
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
     });
   };
 
+  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
+    setSaving(true);
     try {
-      await axios.post("/api/data", formData);
-      toast.success("Data submitted successfully!");
-
-      // clear form
-      setFormData({
-        rego: "",
-        driverId: "",
-        carModel: "",
-        driverName: "",
-        rentPerWeek: "",
-        receipt: "",
-        amountReceiver: "",
-        expense: "",
-        description: "",
-        carNumber: "",
-        rented: false,
-        rentedDate: "",
-
-      });
+      await axios.put(`/api/data/${id}`, formData);
+      toast.success("Car updated successfully!");
+      router.push(`/${page}`); // redirect back to the original page (e.g. dashboard)
     } catch (error) {
-      console.error("Submission error:", error);
-      toast.error("Failed to submit data. Try again.");
+      console.error("Update error:", error);
+      toast.error("Failed to update car.");
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[88.8vh]">
+        <Loader2 className="animate-spin h-8 w-8 text-gray-600" />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -90,14 +121,16 @@ export default function EditorPage() {
       <Card className="w-full max-w-3xl shadow-lg h-[85vh] overflow-y-auto">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
-            Car Rental Editor
+            Edit Car Details
           </CardTitle>
         </CardHeader>
+
         <CardContent>
           <form
             onSubmit={handleSubmit}
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
+            {/* Registration */}
             <div>
               <Label htmlFor="rego">Registration No.</Label>
               <Input
@@ -110,6 +143,7 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* Car Model */}
             <div>
               <Label htmlFor="carModel">Car Model</Label>
               <Input
@@ -122,6 +156,7 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* Driver Name */}
             <div>
               <Label htmlFor="driverName">Driver Name</Label>
               <Input
@@ -132,17 +167,20 @@ export default function EditorPage() {
                 className="max-w-sm"
               />
             </div>
-            <div >
+
+            {/* Driver ID */}
+            <div>
               <Label htmlFor="driverId">Driver ID</Label>
               <Input
                 id="driverId"
                 name="driverId"
-                checked={formData.driverId}
+                value={formData.driverId}
                 onChange={handleChange}
                 className="max-w-sm"
               />
             </div>
 
+            {/* Rent Per Week */}
             <div>
               <Label htmlFor="rentPerWeek">Rent Per Week</Label>
               <Input
@@ -156,6 +194,7 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* Receipt */}
             <div>
               <Label htmlFor="receipt">Receipt</Label>
               <Input
@@ -167,6 +206,7 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* Amount Receiver */}
             <div>
               <Label htmlFor="amountReceiver">Amount Received</Label>
               <Input
@@ -179,6 +219,7 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* Expense */}
             <div>
               <Label htmlFor="expense">Expense</Label>
               <Input
@@ -191,6 +232,7 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* Car Number */}
             <div>
               <Label htmlFor="carNumber">Car Number</Label>
               <Input
@@ -203,6 +245,7 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* Rented Checkbox */}
             <div className="flex items-center space-x-2">
               <input
                 id="rented"
@@ -214,18 +257,20 @@ export default function EditorPage() {
               />
               <Label htmlFor="rented">Rented?</Label>
             </div>
-            <div >
-              <Label htmlFor="rentedDate">RentedDate</Label>
+
+            {/* Rented Date */}
+            <div>
+              <Label htmlFor="rentedDate">Rented Date</Label>
               <Input
                 id="rentedDate"
                 name="rentedDate"
-                checked={formData.rentedDate}
+                value={formData.rentedDate}
                 onChange={handleChange}
                 className="max-w-sm"
               />
             </div>
 
-
+            {/* Description */}
             <div className="md:col-span-2">
               <Label htmlFor="description">Description</Label>
               <Textarea
@@ -237,14 +282,15 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* Submit */}
             <div className="md:col-span-2 flex justify-center">
               <Button
                 type="submit"
-                disabled={loading}
+                disabled={saving}
                 className="w-48 flex items-center justify-center"
               >
-                {loading && <Loader2 className="animate-spin mr-2 h-5 w-5" />}
-                {loading ? "Submitting..." : "Submit"}
+                {saving && <Loader2 className="animate-spin mr-2 h-5 w-5" />}
+                {saving ? "Saving..." : "Save"}
               </Button>
             </div>
           </form>

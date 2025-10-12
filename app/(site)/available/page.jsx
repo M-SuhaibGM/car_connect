@@ -62,7 +62,7 @@ export default function AvailableCarsPage() {
 
   return (
     <div
-      className="min-h-[90vh] bg-gray-100 p-6"
+      className="min-h-[88.8vh] bg-gray-100 p-6"
       style={{
         backgroundImage: "url('/car.jpg')",
         backgroundSize: "cover",
@@ -86,15 +86,20 @@ export default function AvailableCarsPage() {
 
       {/* Cards Layout */}
       {filteredCars.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6  max-h-[70vh]">
           {filteredCars.map((car) => (
-            <Card key={car.id} className="shadow-lg hover:shadow-xl transition-all">
-              <CardHeader className="flex justify-between items-center">
-                <CardTitle>{car.carModel ?? "Unknown Model"}</CardTitle>
+            <Card
+              key={car.id}
+              className="shadow-md hover:shadow-lg transition-all w-[200px] md:w-[260px] rounded-lg overflow-hidden"
+            >
+              <CardHeader className="flex justify-between items-center p-2">
+                <CardTitle className="text-sm font-semibold truncate">
+                  {car.carModel ?? "Unknown Model"}
+                </CardTitle>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontal className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" className="h-6 w-6">
+                      <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
@@ -113,28 +118,30 @@ export default function AvailableCarsPage() {
                 </DropdownMenu>
               </CardHeader>
 
-              <CardContent className="flex flex-col items-center text-center space-y-3">
+              <CardContent className="flex flex-col items-center text-center space-y-1.5 p-2">
                 <Image
                   src="/car.png"
                   alt="Car"
-                  width={120}
-                  height={120}
-                  className="h-30 w-30 object-contain"
+                  width={75}
+                  height={75}
+                  className="object-contain"
                 />
-                <p>
-                  <strong>Car Number:</strong> {car.carNumber ?? "-"}
+                <p className="text-xs">
+                  <strong>Car #:</strong> {car.carNumber ?? "-"}
                 </p>
-                <p>
+                <p className="text-xs">
                   <strong>Rego:</strong> {car.rego ?? "-"}
                 </p>
-                <p>
-                  <strong>Rent Per Week:</strong> ${car.rentPerWeek ?? 0}
+                <p className="text-xs">
+                  <strong>Rent:</strong> ${car.rentPerWeek ?? 0}
                 </p>
-                <p>
-                  <strong>Description:</strong> {car.description ?? "-"}
+                <p className="text-xs line-clamp-1">
+                  <strong>Desc:</strong> {car.description ?? "-"}
                 </p>
               </CardContent>
             </Card>
+
+
           ))}
         </div>
       ) : (

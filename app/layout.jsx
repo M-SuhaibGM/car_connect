@@ -1,7 +1,7 @@
 
 import "./globals.css";
 import { Toaster } from "sonner";
-import Navbar from "./components/Navbar";
+import SessionWrapper from "@/components/ui/SessionWrapper";
 
 
 export const metadata = {
@@ -15,11 +15,10 @@ export default function RootLayout({ children }) {
       <body
         className={`antialiased`}
       >
-        <div className="flex flex-col min-h-screen">
-          <Navbar />
+        <SessionWrapper>
           {children}
           <Toaster />
-        </div>
+        </SessionWrapper>
       </body>
     </html>
   );

@@ -12,10 +12,10 @@ export default function ContactPage() {
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         objectFit: "cover",
-        minHeight: "90vh",
+        minHeight: "88.8vh",
         width: "100%",
       }}
-      className="min-h-[90vh] flex items-center justify-center bg-gray-50 px-6 py-12"
+      className="min-h-[88.8vh] flex items-center justify-center bg-gray-50 px-6 py-12"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl w-full">
         {/* Managing Director Card */}
@@ -28,7 +28,7 @@ export default function ContactPage() {
           <h2 className="text-2xl font-bold text-gray-800">
             Rao Majid Saleem
           </h2>
-          <p className="text-gray-500 mb-6">Car Rantel Owner</p>
+          <p className="text-gray-500 mb-6">Car Rental Owner</p>
 
           <div className="space-y-4 text-left">
             <div className="flex items-center space-x-3">
@@ -55,7 +55,7 @@ export default function ContactPage() {
           </div>
 
           <p className="mt-8 text-sm text-gray-500">
-            Powered by <span className="font-medium">Rao Majid Saleem</span>
+            Powered by <span className="font-medium">Rao Waleed Nisar</span>
           </p>
         </div>
 
@@ -106,7 +106,7 @@ export default function ContactPage() {
           </div>
 
           <p className="mt-8 text-sm text-gray-500">
-            Powered by <span className="font-medium">Rao Waleed Nasir</span>
+            Powered by <span className="font-medium">Rao Waleed Nisar</span>
           </p>
         </div>
       </div>
