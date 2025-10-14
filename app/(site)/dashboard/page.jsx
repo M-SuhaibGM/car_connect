@@ -24,11 +24,21 @@ import { toast } from "sonner";
 import AllCars from "../components/AllCars";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+
 
 export default function DashboardPage() {
     const [cars, setCars] = useState([]);
     const [loading, setLoading] = useState(true);
     const { data: session, status } = useSession();
+    const [showPendingDialog, setShowPendingDialog] = useState(false);
+
     const router = useRouter();
     // ✅ Fetch all cars
     useEffect(() => {
@@ -240,14 +250,98 @@ export default function DashboardPage() {
             </div>
 
             {/* Totals */}
+            {/* Totals */}
             <div className="flex flex-wrap justify-center gap-4 mt-10">
                 <Button variant="default" className="bg-blue-600 hover:bg-blue-700">
                     💰 Total Rent Received: ${totalReceived.toFixed(2)}
                 </Button>
-                <Button variant="default" className="bg-gray-500">
+
+                {/* ⚠️ Pending Button Opens Dialog */}
+                <Button
+                    variant="default"
+                    className="bg-gray-500 hover:bg-gray-600"
+                    onClick={() => setShowPendingDialog(true)}
+                >
                     ⚠️ Total Pending Rent: ${totalPending.toFixed(2)}
                 </Button>
             </div>
+
+            {/* 🧾 Pending Rent Dialog */}
+            <Dialog open={showPendingDialog} onOpenChange={setShowPendingDialog}>
+                <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="text-2xl font-semibold text-center">
+                            ⚠️ Pending Rent Details
+                        </DialogTitle>
+                    </DialogHeader>
+
+                    {driverSummaries.every((d) => d.totalPending === 0) ? (
+                        <p className="text-center text-gray-500 mt-6">
+                            🎉 No pending payments — all clear!
+                        </p>
+                    ) : (
+                        <div className="space-y-6 mt-4">
+                            {driverSummaries
+                                .filter((d) => d.totalPending > 0)
+                                .map((d) => (
+                                    <div
+                                        key={d.driverId}
+                                        className="border rounded-lg p-4 shadow-sm bg-gray-50"
+                                    >
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <Image
+                                                src="/driver.jpg"
+                                                alt="Driver Avatar"
+                                                width={40}
+                                                height={40}
+                                                className="rounded-full border"
+                                            />
+                                            <div>
+                                                <h3 className="font-semibold text-lg">{d.driverName}</h3>
+                                                <p className="text-sm text-gray-500">
+                                                    Pending Total: ${d.totalPending.toFixed(2)}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Table of this driver's pending cars */}
+                                        <table className="w-full text-sm border border-gray-200 rounded-md mt-2">
+                                            <thead className="bg-gray-100 text-gray-700">
+                                                <tr>
+                                                    <th className="px-2 py-1 text-left">Car #</th>
+                                                    <th className="px-2 py-1 text-left">Rent/Week</th>
+                                                    <th className="px-2 py-1 text-left">Received</th>
+                                                    <th className="px-2 py-1 text-left">Pending</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {d.cars
+                                                    .filter((car) => (car.rentPerWeek || 0) - (car.amountReceiver || 0) > 0)
+                                                    .map((car, i) => {
+                                                        const pending =
+                                                            (car.rentPerWeek || 0) - (car.amountReceiver || 0);
+                                                        return (
+                                                            <tr key={i} className="border-t text-gray-700">
+                                                                <td className="px-2 py-1">{car.carNumber}</td>
+                                                                <td className="px-2 py-1">${car.rentPerWeek || 0}</td>
+                                                                <td className="px-2 py-1 text-green-600">
+                                                                    ${car.amountReceiver || 0}
+                                                                </td>
+                                                                <td className="px-2 py-1 text-red-600">
+                                                                    ${pending.toFixed(2)}
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ))}
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
+
             <h1 className="text-3xl font-bold  flex  items-center gap-1.5   text-white mb-8">
                 <Layout className="h-7 w-7" />
                 Graph
