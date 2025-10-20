@@ -8,10 +8,10 @@ export async function GET() {
 
     const session = await getServerSession(authOptions);
 
-    if (!session) {
+    if (!session ) {
       return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { success: false, error: "Access denied: Admins only" },
+        { status: 403 }
       );
     }
     const drivers = await prisma.drivers.findMany({
@@ -26,11 +26,12 @@ export async function GET() {
 export async function POST(req) {
   try {
     const session = await getServerSession(authOptions);
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL; // 👈 admin email from .env
 
-    if (!session) {
+    if (!session || session.user?.email !== adminEmail) {
       return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { success: false, error: "Access denied: Admins only" },
+        { status: 403 }
       );
     }
     const body = await req.json();

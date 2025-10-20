@@ -6,11 +6,12 @@ import { authOptions } from "@/lib/auth";
 export async function GET(req, { params }) {
 
   const session = await getServerSession(authOptions);
+ // 👈 admin email from .env
 
-  if (!session) {
+  if (!session ) {
     return NextResponse.json(
-      { success: false, error: "Unauthorized" },
-      { status: 401 }
+      { success: false, error: "Access denied: Admins only" },
+      { status: 403 }
     );
   }
   const { id } = await params;
@@ -24,11 +25,12 @@ export async function PUT(req, { params }) {
 
 
   const session = await getServerSession(authOptions);
+  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL; // 👈 admin email from .env
 
-  if (!session) {
+  if (!session || session.user?.email !== adminEmail) {
     return NextResponse.json(
-      { success: false, error: "Unauthorized" },
-      { status: 401 }
+      { success: false, error: "Access denied: Admins only" },
+      { status: 403 }
     );
   }
   const { id } = await params;
@@ -44,11 +46,12 @@ export async function DELETE(req, { params }) {
 
 
   const session = await getServerSession(authOptions);
+  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL; // 👈 admin email from .env
 
-  if (!session) {
+  if (!session || session.user?.email !== adminEmail) {
     return NextResponse.json(
-      { success: false, error: "Unauthorized" },
-      { status: 401 }
+      { success: false, error: "Access denied: Admins only" },
+      { status: 403 }
     );
   }
   const { id } = await params;

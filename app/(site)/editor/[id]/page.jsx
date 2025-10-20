@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { UploadDropzone } from "@/lib/uploadthing";
 
 export default function EditorPage() {
   const { id } = useParams();
@@ -31,16 +32,20 @@ export default function EditorPage() {
     receipt: "",
     amountReceiver: "",
     expense: "",
+    profit: "",
+    loss: "",
     description: "",
     carNumber: "",
     rented: false,
     rentedDate: "",
+    imageUrl: "",
+    week: "",
   });
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Fetch car data
+  // ✅ Fetch car data
   useEffect(() => {
     async function fetchCar() {
       try {
@@ -56,10 +61,14 @@ export default function EditorPage() {
           receipt: car.receipt || "",
           amountReceiver: car.amountReceiver ?? "",
           expense: car.expense ?? "",
+          profit: car.profit ?? "",
+          loss: car.loss ?? "",
           description: car.description || "",
           carNumber: car.carNumber || "",
           rented: car.rented ?? false,
           rentedDate: car.rentedDate || "",
+          imageUrl: car.imageUrl || "",
+          week: car.week || "",
         });
       } catch (error) {
         console.error("Error fetching car:", error);
@@ -72,7 +81,7 @@ export default function EditorPage() {
     if (id) fetchCar();
   }, [id]);
 
-  // Handle input change
+  // ✅ Handle input change
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -81,14 +90,14 @@ export default function EditorPage() {
     });
   };
 
-  // Handle form submit
+  // ✅ Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
       await axios.put(`/api/data/${id}`, formData);
       toast.success("Car updated successfully!");
-      router.push(`/${page}`); // redirect back to the original page (e.g. dashboard)
+      router.push(`/${page}`);
     } catch (error) {
       console.error("Update error:", error);
       toast.error("Failed to update car.");
@@ -180,6 +189,24 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* Week Select */}
+            <div>
+              <Label htmlFor="week">Week</Label>
+              <select
+                id="week"
+                name="week"
+                value={formData.week}
+                onChange={handleChange}
+                className="border border-gray-300 rounded-md p-2 w-full max-w-sm"
+              >
+                <option value="">Select Week</option>
+                <option value="1">Week 1</option>
+                <option value="2">Week 2</option>
+                <option value="3">Week 3</option>
+                <option value="4">Week 4</option>
+              </select>
+            </div>
+
             {/* Rent Per Week */}
             <div>
               <Label htmlFor="rentPerWeek">Rent Per Week</Label>
@@ -232,6 +259,32 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* Profit */}
+            <div>
+              <Label htmlFor="profit">Profit</Label>
+              <Input
+                id="profit"
+                name="profit"
+                type="number"
+                value={formData.profit}
+                onChange={handleChange}
+                className="max-w-sm"
+              />
+            </div>
+
+            {/* Loss */}
+            <div>
+              <Label htmlFor="loss">Loss</Label>
+              <Input
+                id="loss"
+                name="loss"
+                type="number"
+                value={formData.loss}
+                onChange={handleChange}
+                className="max-w-sm"
+              />
+            </div>
+
             {/* Car Number */}
             <div>
               <Label htmlFor="carNumber">Car Number</Label>
@@ -264,10 +317,45 @@ export default function EditorPage() {
               <Input
                 id="rentedDate"
                 name="rentedDate"
+                type="text"
                 value={formData.rentedDate}
                 onChange={handleChange}
                 className="max-w-sm"
               />
+            </div>
+
+            {/* Image Upload */}
+            <div className="md:col-span-2">
+              <Label>Car Image</Label>
+              <UploadDropzone
+                endpoint="carImage"
+                onClientUploadComplete={(res) => {
+                  if (res?.[0]?.url) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      imageUrl: res[0].url,
+                    }));
+                    toast.success("Image uploaded!");
+                  }
+                }}
+                onUploadError={(error) => {
+                  toast.error(`Upload failed: ${error.message}`);
+                }}
+                appearance={{
+                  container:
+                    "border-2 border-dashed border-gray-300 rounded-md p-6",
+                  button:
+                    "bg-blue-600 text-white px-4 py-2 rounded-md mt-2 hover:bg-blue-700",
+                  allowedContent: "text-gray-500 text-sm mt-1",
+                }}
+              />
+              {formData.imageUrl && (
+                <img
+                  src={formData.imageUrl}
+                  alt="Car"
+                  className="mt-3 rounded-md w-40 h-28 object-cover border"
+                />
+              )}
             </div>
 
             {/* Description */}

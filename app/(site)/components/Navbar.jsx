@@ -8,8 +8,7 @@ import {
   Popover,
   PopoverTrigger,
   PopoverContent,
-} from "@/components/ui/popover";
-import { AmpersandIcon } from "lucide-react";
+} from "../../../components/ui/popover";
 
 const Navbar = () => {
   const pathname = usePathname();

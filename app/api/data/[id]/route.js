@@ -2,9 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-/**
- * ✅ GET single car by ID
- */
+
 export async function GET(req, { params }) {
   try {
 
@@ -13,8 +11,8 @@ export async function GET(req, { params }) {
 
     if (!session) {
       return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { success: false, error: "Access denied: Admins only" },
+        { status: 403 }
       );
     }
     const { id } = await params; // ✅ safely await context
@@ -37,11 +35,12 @@ export async function PUT(req, { params }) {
   try {
 
     const session = await getServerSession(authOptions);
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL; // 👈 admin email from .env
 
-    if (!session) {
+    if (!session || session.user?.email !== adminEmail) {
       return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { success: false, error: "Access denied: Admins only" },
+        { status: 403 }
       );
     }
     const { id } = await params;
@@ -64,6 +63,10 @@ export async function PUT(req, { params }) {
         rented: body.rented,
         rentedDate: body.rentedDate,
         driverId: body.driverId,
+        imageUrl: body.imageUrl,
+        week: parseInt(body.week),
+        profit: body.profit,
+        loss: body.loss
       },
     });
 
@@ -80,10 +83,12 @@ export async function DELETE(req, { params }) {
 
     const session = await getServerSession(authOptions);
 
-    if (!session) {
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL; // 👈 admin email from .env
+
+    if (!session || session.user?.email !== adminEmail) {
       return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { success: false, error: "Access denied: Admins only" },
+        { status: 403 }
       );
     }
     const { id } = await params;

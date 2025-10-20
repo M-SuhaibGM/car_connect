@@ -125,13 +125,12 @@ export default function AllCars() {
                             {/* 🧱 Two-column content */}
                             <CardContent className="grid grid-cols-2 gap-2 px-4 pb-4 items-center">
                                 {/* 🖼️ Left: Image */}
-                                <div className="flex justify-center">
+                                <div className="flex justify-center  h-[100px] w-[130px] relative ">
                                     <Image
-                                        src="/car.png"
+                                        src={car.imageUrl ?? "/car.jpg"}
                                         alt="Car"
-                                        width={70}
-                                        height={70}
-                                        className="object-contain"
+                                        fill
+                                        className="absolute object-cover  rounded-md"
                                     />
                                 </div>
 
@@ -160,7 +159,7 @@ export default function AllCars() {
                                         <p>
                                             <strong>Rented Date:</strong>{" "}
                                             {car.rentedDate
-                                                }
+                                            }
                                         </p>
                                     </div>
                                 )}

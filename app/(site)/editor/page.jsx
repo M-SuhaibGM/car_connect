@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
+import { UploadDropzone } from "@/lib/uploadthing";
 
 export default function EditorPage() {
   const [formData, setFormData] = useState({
@@ -25,17 +26,20 @@ export default function EditorPage() {
     receipt: "",
     amountReceiver: "",
     expense: "",
+    loss: "",
+    profit: "",
     description: "",
     carNumber: "",
-    rented: false, // boolean
+    rented: false,
     rentedDate: "",
-
+    imageUrl: "",
+    week: "",
   });
+
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
@@ -45,12 +49,9 @@ export default function EditorPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       await axios.post("/api/data", formData);
       toast.success("Data submitted successfully!");
-
-      // clear form
       setFormData({
         rego: "",
         driverId: "",
@@ -60,11 +61,14 @@ export default function EditorPage() {
         receipt: "",
         amountReceiver: "",
         expense: "",
+        loss: "",
+        profit: "",
         description: "",
         carNumber: "",
         rented: false,
         rentedDate: "",
-
+        imageUrl: "",
+        week: "",
       });
     } catch (error) {
       console.error("Submission error:", error);
@@ -93,11 +97,13 @@ export default function EditorPage() {
             Car Rental Editor
           </CardTitle>
         </CardHeader>
+
         <CardContent>
           <form
             onSubmit={handleSubmit}
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
+            {/* Registration No */}
             <div>
               <Label htmlFor="rego">Registration No.</Label>
               <Input
@@ -110,6 +116,7 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* Car Model */}
             <div>
               <Label htmlFor="carModel">Car Model</Label>
               <Input
@@ -122,6 +129,7 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* Driver Name */}
             <div>
               <Label htmlFor="driverName">Driver Name</Label>
               <Input
@@ -132,17 +140,39 @@ export default function EditorPage() {
                 className="max-w-sm"
               />
             </div>
-            <div >
+
+            {/* Driver ID */}
+            <div>
               <Label htmlFor="driverId">Driver ID</Label>
               <Input
                 id="driverId"
                 name="driverId"
-                checked={formData.driverId}
+                value={formData.driverId}
                 onChange={handleChange}
                 className="max-w-sm"
               />
             </div>
 
+            {/* Week Select */}
+            <div>
+              <Label htmlFor="week">Week</Label>
+              <select
+                id="week"
+                name="week"
+                value={formData.week}
+                onChange={handleChange}
+                className="border border-gray-300 rounded-md p-2 w-full max-w-sm"
+                required
+              >
+                <option value="">Select Week</option>
+                <option value="1">Week 1</option>
+                <option value="2">Week 2</option>
+                <option value="3">Week 3</option>
+                <option value="4">Week 4</option>
+              </select>
+            </div>
+
+            {/* Rent Per Week */}
             <div>
               <Label htmlFor="rentPerWeek">Rent Per Week</Label>
               <Input
@@ -156,6 +186,7 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* Receipt */}
             <div>
               <Label htmlFor="receipt">Receipt</Label>
               <Input
@@ -167,6 +198,7 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* Amount Receiver */}
             <div>
               <Label htmlFor="amountReceiver">Amount Received</Label>
               <Input
@@ -179,6 +211,7 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* Expense */}
             <div>
               <Label htmlFor="expense">Expense</Label>
               <Input
@@ -191,6 +224,33 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* 🔹 Loss */}
+            <div>
+              <Label htmlFor="loss">Loss</Label>
+              <Input
+                id="loss"
+                name="loss"
+                type="number"
+                value={formData.loss}
+                onChange={handleChange}
+                className="max-w-sm"
+              />
+            </div>
+
+            {/* 🔹 Profit */}
+            <div>
+              <Label htmlFor="profit">Profit</Label>
+              <Input
+                id="profit"
+                name="profit"
+                type="number"
+                value={formData.profit}
+                onChange={handleChange}
+                className="max-w-sm"
+              />
+            </div>
+
+            {/* Car Number */}
             <div>
               <Label htmlFor="carNumber">Car Number</Label>
               <Input
@@ -203,6 +263,7 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* Rented Checkbox */}
             <div className="flex items-center space-x-2">
               <input
                 id="rented"
@@ -214,18 +275,55 @@ export default function EditorPage() {
               />
               <Label htmlFor="rented">Rented?</Label>
             </div>
-            <div >
-              <Label htmlFor="rentedDate">RentedDate</Label>
+
+            {/* Rented Date */}
+            <div>
+              <Label htmlFor="rentedDate">Rented Date</Label>
               <Input
                 id="rentedDate"
                 name="rentedDate"
-                checked={formData.rentedDate}
+                type="text"
+                value={formData.rentedDate}
                 onChange={handleChange}
                 className="max-w-sm"
               />
             </div>
 
+            {/* Image Upload */}
+            <div className="md:col-span-2">
+              <Label>Car Image</Label>
+              <UploadDropzone
+                endpoint="carImage"
+                onClientUploadComplete={(res) => {
+                  if (res?.[0]?.url) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      imageUrl: res[0].url,
+                    }));
+                    toast.success("Image uploaded!");
+                  }
+                }}
+                onUploadError={(error) => {
+                  toast.error(`Upload failed: ${error.message}`);
+                }}
+                appearance={{
+                  container:
+                    "border-2 border-dashed border-gray-300 rounded-md p-6",
+                  button:
+                    "bg-blue-600 text-white px-4 py-2 rounded-md mt-2 hover:bg-blue-700",
+                  allowedContent: "text-gray-500 text-sm mt-1",
+                }}
+              />
+              {formData.imageUrl && (
+                <img
+                  src={formData.imageUrl}
+                  alt="Car"
+                  className="mt-3 rounded-md w-40 h-28 object-cover border"
+                />
+              )}
+            </div>
 
+            {/* Description */}
             <div className="md:col-span-2">
               <Label htmlFor="description">Description</Label>
               <Textarea
@@ -237,6 +335,7 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* Submit */}
             <div className="md:col-span-2 flex justify-center">
               <Button
                 type="submit"

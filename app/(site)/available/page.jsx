@@ -15,12 +15,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 export default function AvailableCarsPage() {
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [checkingAdmin, setCheckingAdmin] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false); // ✅ state for admin
   const router = useRouter();
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status !== "loading") {
+      const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+      const isAdminUser = session?.user?.email === adminEmail;
+      setIsAdmin(isAdminUser);
+      setCheckingAdmin(false);
+    }
+  }, [status, session]);
 
   useEffect(() => {
     async function fetchCars() {
@@ -52,7 +65,7 @@ export default function AvailableCarsPage() {
     car.carNumber?.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (loading) {
+  if (loading || checkingAdmin) {
     return (
       <div className="flex items-center justify-center min-h-[90vh]">
         <Loader2 className="animate-spin h-8 w-8 text-gray-600" />
@@ -84,9 +97,8 @@ export default function AvailableCarsPage() {
         </div>
       </div>
 
-      {/* Cards Layout */}
       {filteredCars.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6  max-h-[70vh]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh]">
           {filteredCars.map((car) => (
             <Card
               key={car.id}
@@ -96,36 +108,43 @@ export default function AvailableCarsPage() {
                 <CardTitle className="text-sm font-semibold truncate">
                   {car.carModel ?? "Unknown Model"}
                 </CardTitle>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-6 w-6">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem
-                      onClick={() => router.push(`/editor/${car.id}/?page=available`)}
-                    >
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="text-red-500"
-                      onClick={() => handleDelete(car.id)}
-                    >
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+
+                {/* ✅ Only show edit/delete if admin */}
+                {isAdmin && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          router.push(`/editor/${car.id}/?page=available`)
+                        }
+                      >
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-red-500"
+                        onClick={() => handleDelete(car.id)}
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </CardHeader>
 
               <CardContent className="flex flex-col items-center text-center space-y-1.5 p-2">
-                <Image
-                  src="/car.png"
-                  alt="Car"
-                  width={75}
-                  height={75}
-                  className="object-contain"
-                />
+                <div className="flex justify-center  h-[100px] w-[200px] relative ">
+                  <Image
+                    src={car.imageUrl ?? "/car.jpg"}
+                    alt="Car"
+                    fill
+                    className="absolute object-cover  rounded-md"
+                  />
+                </div>
                 <p className="text-xs">
                   <strong>Car #:</strong> {car.carNumber ?? "-"}
                 </p>
@@ -140,8 +159,6 @@ export default function AvailableCarsPage() {
                 </p>
               </CardContent>
             </Card>
-
-
           ))}
         </div>
       ) : (

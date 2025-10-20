@@ -8,10 +8,11 @@ export async function GET(req, { params }) {
 
         const session = await getServerSession(authOptions);
 
+
         if (!session) {
             return NextResponse.json(
-                { success: false, error: "Unauthorized" },
-                { status: 401 }
+                { success: false, error: "Access denied: Admins only" },
+                { status: 403 }
             );
         }
         const { id } = await params

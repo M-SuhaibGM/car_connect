@@ -3,15 +3,16 @@ import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-// 🛑 Create Car (Only for Authenticated Users)
+// 🛑 Create Car (Only Admin Email from .env)
 export async function POST(req) {
   try {
     const session = await getServerSession(authOptions);
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL; // 👈 admin email from .env
 
-    if (!session) {
+    if (!session || session.user?.email !== adminEmail) {
       return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { success: false, error: "Access denied: Admins only" },
+        { status: 403 }
       );
     }
 
@@ -31,8 +32,13 @@ export async function POST(req) {
         rented: Boolean(body.rented),
         rentedDate: body.rentedDate,
         driverId: body.driverId,
+        imageUrl: body.imageUrl,
+        week: parseInt(body.week),
+        profit: body.profit,
+        loss: body.loss,
       },
     });
+
     return NextResponse.json({ success: true, car });
   } catch (error) {
     console.error("Error saving data:", error);
@@ -43,15 +49,16 @@ export async function POST(req) {
   }
 }
 
-// 🛑 Get Cars (Only for Authenticated Users)
+// 🛑 Get Cars (Only Admin Email from .env)
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
+
     if (!session) {
       return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { success: false, error: "Access denied: Admins only" },
+        { status: 403 }
       );
     }
 

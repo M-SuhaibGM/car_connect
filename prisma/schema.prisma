@@ -46,6 +46,7 @@ model Car {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   driverId       String
   driverName     String
+  week           Int?
   rego           String
   carModel       String
   rentPerWeek    Float?
@@ -56,6 +57,9 @@ model Car {
   carNumber      String
   rented         Boolean
   description    String?
+  imageUrl       String?
+  loss           String?
+  profit         String?
   createdAt      DateTime @default(now())
 }
 
@@ -65,4 +69,16 @@ model Drivers {
   phoneNumber String?
   idNumber    String?
   adress      String?
+  imageUrl    String?
+}
+
+model DriverReview {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  driverId       String
+  driverName     String?
+  driverImageUrl String?
+  carImageUrl    String?
+  description    String?
+  rating         Int?
+  createdAt      DateTime @default(now())
 }
