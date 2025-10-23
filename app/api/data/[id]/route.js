@@ -66,7 +66,8 @@ export async function PUT(req, { params }) {
         imageUrl: body.imageUrl,
         week: parseInt(body.week),
         profit: body.profit,
-        loss: body.loss
+        loss: body.loss,
+        receiptImageUrl: body.receiptImageUrl
       },
     });
 

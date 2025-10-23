@@ -43,24 +43,25 @@ model Account {
 }
 
 model Car {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  driverId       String
-  driverName     String
-  week           Int?
-  rego           String
-  carModel       String
-  rentPerWeek    Float?
-  receipt        String?
-  rentedDate     String?
-  amountReceiver Float?
-  expense        Float?
-  carNumber      String
-  rented         Boolean
-  description    String?
-  imageUrl       String?
-  loss           String?
-  profit         String?
-  createdAt      DateTime @default(now())
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  driverId        String
+  driverName      String
+  week            Int?
+  rego            String
+  carModel        String
+  rentPerWeek     Float?
+  receipt         String?
+  rentedDate      String?
+  amountReceiver  Float?
+  expense         Float?
+  carNumber       String
+  rented          Boolean
+  description     String?
+  imageUrl        String?
+  loss            String?
+  profit          String?
+  receiptImageUrl String?
+  createdAt       DateTime @default(now())
 }
 
 model Drivers {

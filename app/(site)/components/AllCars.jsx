@@ -127,7 +127,7 @@ export default function AllCars() {
                                 {/* 🖼️ Left: Image */}
                                 <div className="flex justify-center  h-[100px] w-[130px] relative ">
                                     <Image
-                                        src={car.imageUrl ?? "/car.jpg"}
+                                        src={car?.imageUrl || "/car.jpg"}
                                         alt="Car"
                                         fill
                                         className="absolute object-cover  rounded-md"

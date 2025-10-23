@@ -33,6 +33,7 @@ export default function EditorPage() {
     rented: false,
     rentedDate: "",
     imageUrl: "",
+    receiptImageUrl: "", // ✅ new field for receipt image
     week: "",
   });
 
@@ -68,6 +69,7 @@ export default function EditorPage() {
         rented: false,
         rentedDate: "",
         imageUrl: "",
+        receiptImageUrl: "", // reset new field
         week: "",
       });
     } catch (error) {
@@ -198,6 +200,40 @@ export default function EditorPage() {
               />
             </div>
 
+            {/* ✅ Receipt Image Upload */}
+            <div className="md:col-span-2">
+              <Label>Receipt Image</Label>
+              <UploadDropzone
+                endpoint="receiptImage"
+                onClientUploadComplete={(res) => {
+                  if (res?.[0]?.url) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      receiptImageUrl: res[0].url,
+                    }));
+                    toast.success("Receipt image uploaded!");
+                  }
+                }}
+                onUploadError={(error) => {
+                  toast.error(`Upload failed: ${error.message}`);
+                }}
+                appearance={{
+                  container:
+                    "border-2 border-dashed border-gray-300 rounded-md p-6",
+                  button:
+                    "bg-green-600 text-white px-4 py-2 rounded-md mt-2 hover:bg-green-700",
+                  allowedContent: "text-gray-500 text-sm mt-1",
+                }}
+              />
+              {formData.receiptImageUrl && (
+                <img
+                  src={formData.receiptImageUrl}
+                  alt="Receipt"
+                  className="mt-3 rounded-md w-40 h-28 object-cover border"
+                />
+              )}
+            </div>
+
             {/* Amount Receiver */}
             <div>
               <Label htmlFor="amountReceiver">Amount Received</Label>
@@ -224,7 +260,7 @@ export default function EditorPage() {
               />
             </div>
 
-            {/* 🔹 Loss */}
+            {/* Loss */}
             <div>
               <Label htmlFor="loss">Loss</Label>
               <Input
@@ -237,7 +273,7 @@ export default function EditorPage() {
               />
             </div>
 
-            {/* 🔹 Profit */}
+            {/* Profit */}
             <div>
               <Label htmlFor="profit">Profit</Label>
               <Input
@@ -289,7 +325,7 @@ export default function EditorPage() {
               />
             </div>
 
-            {/* Image Upload */}
+            {/* Car Image Upload */}
             <div className="md:col-span-2">
               <Label>Car Image</Label>
               <UploadDropzone
@@ -300,7 +336,7 @@ export default function EditorPage() {
                       ...prev,
                       imageUrl: res[0].url,
                     }));
-                    toast.success("Image uploaded!");
+                    toast.success("Car image uploaded!");
                   }
                 }}
                 onUploadError={(error) => {

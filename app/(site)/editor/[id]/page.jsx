@@ -30,6 +30,7 @@ export default function EditorPage() {
     driverName: "",
     rentPerWeek: "",
     receipt: "",
+    receiptImageUrl: "", // ✅ added new field
     amountReceiver: "",
     expense: "",
     profit: "",
@@ -45,13 +46,11 @@ export default function EditorPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // ✅ Fetch car data
   useEffect(() => {
     async function fetchCar() {
       try {
         const res = await axios.get(`/api/data/${id}`);
         const car = res.data;
-
         setFormData({
           rego: car.rego || "",
           driverId: car.driverId || "",
@@ -59,6 +58,7 @@ export default function EditorPage() {
           driverName: car.driverName || "",
           rentPerWeek: car.rentPerWeek ?? "",
           receipt: car.receipt || "",
+          receiptImage: car.receiptImageUrl || "", // ✅ load existing image if any
           amountReceiver: car.amountReceiver ?? "",
           expense: car.expense ?? "",
           profit: car.profit ?? "",
@@ -81,7 +81,6 @@ export default function EditorPage() {
     if (id) fetchCar();
   }, [id]);
 
-  // ✅ Handle input change
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -90,7 +89,6 @@ export default function EditorPage() {
     });
   };
 
-  // ✅ Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -189,7 +187,7 @@ export default function EditorPage() {
               />
             </div>
 
-            {/* Week Select */}
+            {/* Week */}
             <div>
               <Label htmlFor="week">Week</Label>
               <select
@@ -231,6 +229,40 @@ export default function EditorPage() {
                 onChange={handleChange}
                 className="max-w-sm"
               />
+            </div>
+
+            {/* ✅ Receipt Image Upload */}
+            <div className="md:col-span-2">
+              <Label>Receipt Image</Label>
+              <UploadDropzone
+                endpoint="receiptImage"
+                onClientUploadComplete={(res) => {
+                  if (res?.[0]?.url) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      receiptImageUrl: res[0].url,
+                    }));
+                    toast.success("Receipt image uploaded!");
+                  }
+                }}
+                onUploadError={(error) => {
+                  toast.error(`Upload failed: ${error.message}`);
+                }}
+                appearance={{
+                  container:
+                    "border-2 border-dashed border-gray-300 rounded-md p-6",
+                  button:
+                    "bg-green-600 text-white px-4 py-2 rounded-md mt-2 hover:bg-green-700",
+                  allowedContent: "text-gray-500 text-sm mt-1",
+                }}
+              />
+              {formData.receiptImageUrl && (
+                <img
+                  src={formData.receiptImageUrl}
+                  alt="Receipt"
+                  className="mt-3 rounded-md w-40 h-28 object-cover border"
+                />
+              )}
             </div>
 
             {/* Amount Receiver */}
@@ -298,7 +330,7 @@ export default function EditorPage() {
               />
             </div>
 
-            {/* Rented Checkbox */}
+            {/* Rented */}
             <div className="flex items-center space-x-2">
               <input
                 id="rented"
@@ -324,7 +356,7 @@ export default function EditorPage() {
               />
             </div>
 
-            {/* Image Upload */}
+            {/* Car Image */}
             <div className="md:col-span-2">
               <Label>Car Image</Label>
               <UploadDropzone
@@ -335,7 +367,7 @@ export default function EditorPage() {
                       ...prev,
                       imageUrl: res[0].url,
                     }));
-                    toast.success("Image uploaded!");
+                    toast.success("Car image uploaded!");
                   }
                 }}
                 onUploadError={(error) => {

@@ -29,6 +29,13 @@ import {
   PaginationItem,
 } from "@/components/ui/pagination";
 import { useSession } from "next-auth/react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"; // shadcn dialog import
+
 
 export default function CarsPage() {
   const [cars, setCars] = useState([]);
@@ -40,6 +47,7 @@ export default function CarsPage() {
   const [currentMonthIndex, setCurrentMonthIndex] = useState(0);
   const router = useRouter();
   const { data: session, status } = useSession();
+  const [selectedImage, setSelectedImage] = useState(null);
 
   // ✅ Admin check
   useEffect(() => {
@@ -248,6 +256,7 @@ export default function CarsPage() {
         backgroundPosition: "center",
       }}
     >
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-white">Rented Cars 🚗</h1>
@@ -269,6 +278,7 @@ export default function CarsPage() {
         </div>
       </div>
 
+      {/* Table */}
       <div className="flex-1 bg-white shadow-lg rounded-lg max-h-[70vh] overflow-hidden">
         <div className="overflow-y-auto max-h-[70vh]">
           <Table className="w-full">
@@ -281,6 +291,7 @@ export default function CarsPage() {
                 <TableHead>Week</TableHead>
                 <TableHead>Rent (Per Week)</TableHead>
                 <TableHead>Receipt</TableHead>
+                <TableHead>Receipt Image</TableHead> {/* 👈 new column */}
                 <TableHead>Received</TableHead>
                 <TableHead>Expense</TableHead>
                 <TableHead>Profit</TableHead>
@@ -288,7 +299,7 @@ export default function CarsPage() {
                 <TableHead>Description</TableHead>
                 <TableHead>Rented Date</TableHead>
                 <TableHead>Car Number</TableHead>
-                <TableHead />
+                <TableHead >Actions</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -303,6 +314,28 @@ export default function CarsPage() {
                     <TableCell>{car.week ?? "-"}</TableCell>
                     <TableCell>${car.rentPerWeek ?? 0}</TableCell>
                     <TableCell>{car.receipt ?? "-"}</TableCell>
+
+                    {/* ✅ Receipt Image cell */}
+                    <TableCell>
+                      {car.receiptImageUrl ? (
+                        <button
+                          onClick={() => setSelectedImage(car?.receiptImageUrl)}
+                          className="hover:opacity-80 transition"
+                        >
+                          <Image
+                            src={car.receiptImageUrl}
+                            alt="Receipt"
+                            width={50}
+                            height={50}
+                            className="rounded-md object-cover border w-[50px] h-[50px] mx-auto"
+                          />
+
+                        </button>
+                      ) : (
+                        <span className="text-gray-400 text-sm">No Image</span>
+                      )}
+                    </TableCell>
+
                     <TableCell>${car.amountReceiver ?? 0}</TableCell>
                     <TableCell>${car.expense ?? 0}</TableCell>
                     <TableCell className="text-green-600 font-semibold">
@@ -344,27 +377,11 @@ export default function CarsPage() {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={14}
+                    colSpan={15}
                     className="text-center py-6 text-gray-500"
                   >
                     No cars found for Week {currentWeek} in {currentMonth}
                   </TableCell>
-                </TableRow>
-              )}
-
-              {filteredCars.length > 0 && (
-                <TableRow className="bg-gray-100 font-semibold">
-                  <TableCell colSpan={8} className="text-right">
-                    Totals:
-                  </TableCell>
-                  <TableCell>${totalExpense}</TableCell>
-                  <TableCell className="text-green-600">
-                    ${totalProfit}
-                  </TableCell>
-                  <TableCell className="text-red-600">
-                    ${totalLoss}
-                  </TableCell>
-                  <TableCell colSpan={3}></TableCell>
                 </TableRow>
               )}
             </TableBody>
@@ -372,47 +389,26 @@ export default function CarsPage() {
         </div>
       </div>
 
-      <div className="flex justify-between mt-4">
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            disabled={currentMonthIndex === months.length - 1}
-            onClick={handleNextMonth}
-          >
-            ← Previous Month
-          </Button>
-          <Button
-            variant="outline"
-            disabled={currentMonthIndex === 0}
-            onClick={handlePrevMonth}
-          >
-            Next Month →
-          </Button>
-        </div>
+      {/* ✅ Dialog to show big image */}
+      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+        <DialogContent className="max-w-2xl w-[90vw]">
+          <DialogHeader>
+            <DialogTitle>Receipt Image</DialogTitle>
+          </DialogHeader>
+          {selectedImage && (
+            <div className="flex justify-center items-center">
+              <Image
+                src={selectedImage}
+                alt="Full Receipt"
+                width={700}
+                height={700}
+                className="rounded-lg object-contain max-h-[70vh] max-w-full mx-auto"
+              />
+            </div>
 
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <Button
-                variant="outline"
-                disabled={currentWeek === 1}
-                onClick={handlePrevWeek}
-              >
-                ← Previous Week
-              </Button>
-            </PaginationItem>
-            <PaginationItem>
-              <Button
-                variant="outline"
-                disabled={currentWeek === 4}
-                onClick={handleNextWeek}
-              >
-                Next Week →
-              </Button>
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
