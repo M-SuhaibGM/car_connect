@@ -185,14 +185,14 @@ export default function LandingPage() {
               className="flex items-center space-x-2 hover:text-green-400"
             >
               <Phone className="w-5 h-5" />
-              <span>+92 300 4381202</span>
+              <span>+61 424 956 011</span>
             </a>
             <a
               href="mailto:waleedcars@gmail.com"
               className="flex items-center space-x-2 hover:text-red-400"
             >
               <Mail className="w-5 h-5" />
-              <span>atharrao7@gmail.com</span>
+              <span>Majidsaleem884@gmail.com</span>
             </a>
           </div>
         </div>
