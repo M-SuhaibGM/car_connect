@@ -6,6 +6,7 @@ import { UploadDropzone } from "../../../../lib/uploadthing";
 import axios from "axios";
 import { toast } from "sonner";
 import { Star } from "lucide-react";
+import Image from "next/image";
 
 export default function DriverReviewPage() {
   const { id } = useParams(); // driver ID
@@ -74,11 +75,15 @@ export default function DriverReviewPage() {
           />
 
           {carImageUrl && (
-            <img
-              src={carImageUrl}
-              alt="Car"
-              className="mt-3 w-full h-40 object-cover rounded-md shadow-md"
-            />
+            <div className="relative w-full h-30 mt-3">
+
+              <Image
+                src={carImageUrl}
+                alt="Car"
+                fill
+                className="object-contain  absolute rounded-md shadow-md"
+              />
+            </div>
           )}
         </div>
 

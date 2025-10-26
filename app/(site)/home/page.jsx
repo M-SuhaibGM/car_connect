@@ -8,10 +8,43 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import axios from "axios";
 
+// 💡 Import the Skeleton component
+import { Skeleton } from "@/components/ui/skeleton";
+
+// --- Skeleton Card Component ---
+const ReviewCardSkeleton = () => (
+  <div className="flex flex-col md:flex-row items-center md:items-start gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm w-[350px] md:w-[500px] p-6 animate-pulse">
+    {/* Profile + Info Skeleton */}
+    <div className="flex flex-col items-center md:items-start text-center md:text-left flex-shrink-0">
+      <Skeleton className="h-[70px] w-[70px] rounded-full mb-2" />
+      <Skeleton className="h-4 w-20 mb-1" />
+      <Skeleton className="h-3 w-16" />
+      <div className="flex justify-center md:justify-start text-yellow-400 mt-1">
+        {/* Five stars for rating placeholder */}
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Star key={i} size={16} fill="currentColor" className="opacity-50" />
+        ))}
+      </div>
+    </div>
+
+    {/* Review Content Skeleton */}
+    <div className="flex-1 w-full">
+      <Skeleton className="h-[180px] w-full rounded-lg mb-3" />
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-[90%]" />
+      </div>
+    </div>
+  </div>
+);
+// -------------------------------
+
 export default function LandingPage() {
   const [driverIdNumber, setDriverIdNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [reviews, setReviews] = useState([]);
+  // 💡 Add a new state for the initial data fetching status
+  const [isFetchingReviews, setIsFetchingReviews] = useState(true);
   const router = useRouter();
 
   // ✅ Fetch all reviews
@@ -19,9 +52,14 @@ export default function LandingPage() {
     const fetchReviews = async () => {
       try {
         const res = await axios.get("/api/reviews");
-        if (res.data.success) setReviews(res.data.reviews);
+        if (res.data.success) {
+          setReviews(res.data.reviews);
+        }
       } catch (error) {
         console.error("Error fetching reviews:", error);
+      } finally {
+        // 💡 Set fetching state to false after attempt
+        setIsFetchingReviews(false);
       }
     };
     fetchReviews();
@@ -29,6 +67,7 @@ export default function LandingPage() {
 
   // ✅ Verify driver and redirect
   const handleReviewAccess = async () => {
+    // ... (rest of the handleReviewAccess function remains the same)
     if (!driverIdNumber.trim()) {
       toast.error("Please enter your Driver ID Number");
       return;
@@ -110,14 +149,22 @@ export default function LandingPage() {
       </section>
 
       {/* ✅ Reviews Section */}
-      <section className="py-12 bg-white">
+      <section className="py-12 bg-gray-200">
         <h3 className="text-center text-3xl font-bold mb-8 text-gray-800">
           What Drivers Say
         </h3>
 
         <div className="overflow-x-auto no-scrollbar px-6">
           <div className="flex gap-6 w-max">
-            {reviews.length > 0 ? (
+            {/* 💡 Conditional rendering for loading, no reviews, or reviews */}
+            {isFetchingReviews ? (
+              // Show two skeleton cards while fetching
+              <>
+                <ReviewCardSkeleton />
+                <ReviewCardSkeleton />
+              </>
+            ) : reviews.length > 0 ? (
+              // Show actual reviews when available
               reviews.map((review) => (
                 <div
                   key={review.id}
@@ -148,13 +195,14 @@ export default function LandingPage() {
                   {/* Review Content */}
                   <div className="flex-1">
                     {review.carImageUrl && (
-                      <Image
-                        src={review.carImageUrl}
-                        alt="Car"
-                        width={400}
-                        height={180}
-                        className="rounded-lg mb-3 object-cover w-full"
-                      />
+                      <div className="flex justify-center h-[180px] w-full relative ">
+                        <Image
+                          src={review.carImageUrl}
+                          alt="Car"
+                          fill
+                          className="absolute object-cover rounded-md"
+                        />
+                      </div>
                     )}
                     <p className="text-gray-700 text-sm italic">
                       “{review.description || "No description provided."}”
@@ -163,12 +211,12 @@ export default function LandingPage() {
                 </div>
               ))
             ) : (
+              // Show 'No reviews yet' message if fetching is complete and no reviews exist
               <p className="text-center text-gray-600 w-full">No reviews yet.</p>
             )}
           </div>
         </div>
       </section>
-
 
       {/* Footer */}
       <footer className="bg-gray-500 text-white py-6">

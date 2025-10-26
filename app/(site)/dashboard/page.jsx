@@ -31,15 +31,96 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+// 💡 Import the Skeleton component
+import { Skeleton } from "@/components/ui/skeleton";
+
+// --- Skeleton Components ---
+
+const DriverCardSkeleton = () => (
+    <Card className="shadow-md border border-gray-200 relative flex flex-col h-[350px] animate-pulse">
+        <CardHeader className="flex flex-row items-center space-x-3 pb-0">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div>
+                <Skeleton className="h-5 w-32 mb-1" />
+                <Skeleton className="h-3 w-20" />
+            </div>
+        </CardHeader>
+
+        <CardContent className="flex-1 flex flex-col justify-between space-y-4 pt-4">
+            {/* Table placeholder */}
+            <div className="space-y-2">
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-full" />
+            </div>
+
+            {/* Totals placeholder */}
+            <div className="mt-3 text-sm space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-2/3" />
+                <Skeleton className="h-4 w-4/5" />
+            </div>
+
+            {/* Button placeholder */}
+            <div className="flex justify-between gap-2 mt-auto pt-3">
+                <Skeleton className="h-8 w-1/2" />
+                <Skeleton className="h-8 w-1/2" />
+            </div>
+        </CardContent>
+    </Card>
+);
+
+const DashboardSkeleton = () => (
+    <div className="p-6 min-h-screen" style={{
+        backgroundImage: "url('/car.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+    }}>
+        <h1 className="text-3xl font-bold flex items-center gap-1.5 text-white mb-8">
+            <LayoutDashboard className="h-7 w-7" />
+            Dashboard
+        </h1>
+        <AllCars />
+        <h1 className="text-3xl font-bold flex items-center gap-1.5 text-white mb-8">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            Drivers
+        </h1>
+        {/* Driver Cards Grid Skeleton */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <DriverCardSkeleton />
+            <DriverCardSkeleton />
+            <DriverCardSkeleton />
+        </div>
+
+        {/* Totals Buttons Skeleton */}
+        <div className="flex flex-wrap justify-center gap-4 mt-10">
+            <Skeleton className="h-10 w-64" />
+            <Skeleton className="h-10 w-64" />
+        </div>
+
+        <h1 className="text-3xl font-bold flex items-center gap-1.5 text-white my-8">
+            <Layout className="h-7 w-7" />
+            Graph
+        </h1>
+
+        {/* Chart Skeleton */}
+        <div className="mt-10 bg-white rounded-xl shadow-md p-4">
+            <Skeleton className="h-6 w-1/2 mx-auto mb-4" />
+            <Skeleton className="h-64 w-full" />
+        </div>
+    </div>
+);
 
 
 export default function DashboardPage() {
     const [cars, setCars] = useState([]);
     const [loading, setLoading] = useState(true);
-    const { data: session, status } = useSession();
     const [showPendingDialog, setShowPendingDialog] = useState(false);
 
     const router = useRouter();
+
     // ✅ Fetch all cars
     useEffect(() => {
         async function fetchData() {
@@ -59,11 +140,7 @@ export default function DashboardPage() {
     }, []);
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-[90vh]">
-                <Loader2 className="animate-spin h-8 w-8 text-gray-600" />
-            </div>
-        );
+        return <DashboardSkeleton />;
     }
 
     // 🧮 Group cars by driverId
@@ -140,21 +217,21 @@ export default function DashboardPage() {
     }));
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen    "
+        <div className="p-6 bg-gray-50 min-h-screen "
             style={{
                 backgroundImage: "url('/car.jpg')",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
             }}>
-            <h1 className="text-3xl font-bold  flex  items-center gap-1.5   text-white mb-8">
+            <h1 className="text-3xl font-bold flex items-center gap-1.5  text-white mb-8">
                 <LayoutDashboard className="h-7 w-7" />
                 Dashboard
 
             </h1>
             <AllCars />
             {/* Driver Cards */}
-            <h1 className="text-3xl font-bold  flex  items-center gap-1.5   text-white mb-8">
+            <h1 className="text-3xl font-bold flex items-center gap-1.5  text-white mb-8">
                 <img src="/driver.jpg" alt="Driver Avatar" width={40} height={40} className="rounded-full border" />
                 Drivers
             </h1>
@@ -250,7 +327,6 @@ export default function DashboardPage() {
             </div>
 
             {/* Totals */}
-            {/* Totals */}
             <div className="flex flex-wrap justify-center gap-4 mt-10">
                 <Button variant="default" className="bg-blue-600 hover:bg-blue-700">
                     💰 Total Rent Received: ${totalReceived.toFixed(2)}
@@ -342,7 +418,7 @@ export default function DashboardPage() {
                 </DialogContent>
             </Dialog>
 
-            <h1 className="text-3xl font-bold  flex  items-center gap-1.5   text-white mb-8">
+            <h1 className="text-3xl font-bold  flex  items-center gap-1.5   text-white mb-8">
                 <Layout className="h-7 w-7" />
                 Graph
 

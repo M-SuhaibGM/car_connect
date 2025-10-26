@@ -9,6 +9,7 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "../../../components/ui/popover";
+import { Skeleton } from "@/components/ui/skeleton"; // 👈 import skeleton from shadcn ui
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -33,7 +34,7 @@ const Navbar = () => {
     { href: "/contect", label: "Contact" },
   ];
 
-  // 🧠 Prevent flicker by waiting for session to finish loading
+  // 🧠 Show skeleton while session is loading
   if (status === "loading") {
     return (
       <nav className="bg-gray-300 shadow-md">
@@ -42,15 +43,19 @@ const Navbar = () => {
             NexaRent
           </Link>
 
-          <ul className="flex space-x-6 text-gray-700 font-medium opacity-0">
-            {limitedLinks.map(({ href, label }) => (
-              <li key={href}>
-                <span>{label}</span>
+          {/* Links Skeleton */}
+          <ul className="flex space-x-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <li key={i}>
+                <Skeleton className="h-5 w-16 rounded-md" />
               </li>
             ))}
           </ul>
 
-          <div className="w-12 h-10" />
+          {/* Profile Skeleton */}
+          <div className="flex items-center space-x-2">
+            <Skeleton className="h-10 w-10 rounded-full" />
+          </div>
         </div>
       </nav>
     );

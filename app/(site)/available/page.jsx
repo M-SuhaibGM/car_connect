@@ -16,13 +16,40 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+// 💡 Import the Skeleton component
+import { Skeleton } from "@/components/ui/skeleton";
+
+// --- Car Card Skeleton Component ---
+const CarCardSkeleton = () => (
+  <Card className="shadow-md transition-all w-[200px] md:w-[260px] rounded-lg overflow-hidden animate-pulse">
+    <CardHeader className="flex justify-between items-center p-2 flex-row">
+      {/* Title Skeleton */}
+      <Skeleton className="h-4 w-2/3" />
+      {/* Menu Button Skeleton */}
+      <Skeleton className="h-6 w-6 rounded-full" />
+    </CardHeader>
+
+    <CardContent className="flex flex-col items-center text-center space-y-1.5 p-2">
+      {/* Image Skeleton */}
+      <div className="flex justify-center h-[100px] w-full relative">
+        <Skeleton className="h-[100px] w-full rounded-md" />
+      </div>
+      {/* Content lines Skeleton */}
+      <Skeleton className="h-3 w-3/4" />
+      <Skeleton className="h-3 w-1/2" />
+      <Skeleton className="h-3 w-1/3" />
+      <Skeleton className="h-3 w-4/5" />
+    </CardContent>
+  </Card>
+);
+// ------------------------------------
 
 export default function AvailableCarsPage() {
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [checkingAdmin, setCheckingAdmin] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false); // ✅ state for admin
+  const [isAdmin, setIsAdmin] = useState(false);
   const router = useRouter();
   const { data: session, status } = useSession();
 
@@ -65,13 +92,46 @@ export default function AvailableCarsPage() {
     car.carNumber?.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (loading || checkingAdmin) {
+  // 1. Keep the check for 'checkingAdmin'
+  if (checkingAdmin) {
     return (
-      <div className="flex items-center justify-center min-h-[90vh]">
-        <Loader2 className="animate-spin h-8 w-8 text-gray-600" />
+      <div
+        className="min-h-[88.8vh] bg-gray-100 p-6"
+        style={{
+          backgroundImage: "url('/car.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold text-white">Available Cars 🚘</h1>
+          <div className="relative w-64">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Search by Car Number..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-8 bg-white"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh]">
+
+          <CarCardSkeleton />
+          <CarCardSkeleton />
+          <CarCardSkeleton />
+        </div>
       </div>
     );
   }
+
+
+  const skeletonCards = Array.from({ length: 3 }).map((_, index) => (
+    <CarCardSkeleton key={index} />
+  ));
+
 
   return (
     <div
@@ -97,7 +157,14 @@ export default function AvailableCarsPage() {
         </div>
       </div>
 
-      {filteredCars.length > 0 ? (
+      {/* 3. Conditional Rendering now prioritizes 'loading' for the skeletons */}
+      {loading ? (
+        // Show the 4 skeleton cards while initial data is loading
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh]">
+          {skeletonCards}
+        </div>
+      ) : filteredCars.length > 0 ? (
+        // Show actual cars after loading
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh]">
           {filteredCars.map((car) => (
             <Card
@@ -137,12 +204,12 @@ export default function AvailableCarsPage() {
               </CardHeader>
 
               <CardContent className="flex flex-col items-center text-center space-y-1.5 p-2">
-                <div className="flex justify-center  h-[100px] w-[200px] relative ">
+                <div className="flex justify-center h-[100px] w-[200px] relative ">
                   <Image
                     src={car.imageUrl ?? "/car.jpg"}
                     alt="Car"
                     fill
-                    className="absolute object-cover  rounded-md"
+                    className="absolute object-cover rounded-md"
                   />
                 </div>
                 <p className="text-xs">
@@ -162,6 +229,7 @@ export default function AvailableCarsPage() {
           ))}
         </div>
       ) : (
+        // Show no results message only after loading is complete and no filter matches
         <p className="text-center text-gray-200 mt-10">
           No cars found matching "{search}"
         </p>

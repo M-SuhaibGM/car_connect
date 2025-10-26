@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Loader2, MoreHorizontal, Search } from "lucide-react";
+import {  MoreHorizontal, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,6 +15,42 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Image from "next/image";
+// 💡 Import the Skeleton component
+import { Skeleton } from "@/components/ui/skeleton";
+
+// --- Card Skeleton Component ---
+const CardSkeleton = () => (
+    <Card className="shadow-md transition-all relative overflow-hidden w-full max-w-xs mx-auto h-[280px] animate-pulse">
+        {/* Header Skeleton */}
+        <CardHeader className="flex flex-row justify-between items-center py-2 px-4">
+            <Skeleton className="h-4 w-3/5" />
+            <div className="h-6 w-6 rounded-full bg-gray-200"></div> {/* Menu button placeholder */}
+        </CardHeader>
+
+        {/* Content Skeleton */}
+        <CardContent className="grid grid-cols-2 gap-2 px-4 pb-4 items-center">
+            {/* Image Skeleton */}
+            <div className="flex justify-center h-[100px] w-[130px] relative">
+                <Skeleton className="h-full w-full rounded-md" />
+            </div>
+
+            {/* Details Skeleton */}
+            <div className="space-y-2 text-sm">
+                <Skeleton className="h-3 w-4/5" />
+                <Skeleton className="h-3 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
+                <Skeleton className="h-3 w-2/3" />
+            </div>
+
+            {/* Driver Info Skeleton (takes full width) */}
+            <div className="col-span-2 mt-2 p-2 rounded bg-gray-100 space-y-2">
+                <Skeleton className="h-3 w-4/5" />
+                <Skeleton className="h-3 w-3/5" />
+            </div>
+        </CardContent>
+    </Card>
+);
+// ------------------------------
 
 export default function AllCars() {
     const [cars, setCars] = useState([]);
@@ -55,19 +91,15 @@ export default function AllCars() {
         car.carNumber?.toLowerCase().includes(search.toLowerCase())
     );
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-[90vh]">
-                <Loader2 className="animate-spin h-8 w-8 text-gray-600" />
-            </div>
-        );
-    }
+    // 🛑 Removing the full-screen Loader2 block here.
+    // We will handle loading within the main return structure below.
 
     return (
         <div className="min-h-[70vh] p-6">
             {/* 🔍 Header */}
             <div className="flex items-center justify-between mb-6">
-                <h1 className="text-3xl font-bold text-white">All Cars 🚗</h1>
+                {/* NOTE: You used 'text-white' here, which might only work if the parent div has a dark background. Assuming it's meant to be visible. */}
+                <h1 className="text-3xl font-bold text-white">All Cars 🚗</h1> 
                 <div className="relative w-64">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
                     <Input
@@ -80,8 +112,16 @@ export default function AllCars() {
                 </div>
             </div>
 
-            {/* 🧩 Cards Layout */}
-            {filteredCars.length > 0 ? (
+            {/* 💡 Conditional Cards Layout: Show Skeleton or Data */}
+            {loading ? (
+                // Show 3 Card Skeletons while loading
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <CardSkeleton />
+                    <CardSkeleton />
+                    <CardSkeleton />
+                </div>
+            ) : filteredCars.length > 0 ? (
+                // Show actual data
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                     {filteredCars.map((car) => (
                         <Card
@@ -125,12 +165,12 @@ export default function AllCars() {
                             {/* 🧱 Two-column content */}
                             <CardContent className="grid grid-cols-2 gap-2 px-4 pb-4 items-center">
                                 {/* 🖼️ Left: Image */}
-                                <div className="flex justify-center  h-[100px] w-[130px] relative ">
+                                <div className="flex justify-center h-[100px] w-[130px] relative ">
                                     <Image
                                         src={car?.imageUrl || "/car.jpg"}
                                         alt="Car"
                                         fill
-                                        className="absolute object-cover  rounded-md"
+                                        className="absolute object-cover rounded-md"
                                     />
                                 </div>
 
@@ -158,8 +198,7 @@ export default function AllCars() {
                                         </p>
                                         <p>
                                             <strong>Rented Date:</strong>{" "}
-                                            {car.rentedDate
-                                            }
+                                            {car.rentedDate}
                                         </p>
                                     </div>
                                 )}
@@ -168,7 +207,8 @@ export default function AllCars() {
                     ))}
                 </div>
             ) : (
-                <p className="text-center text-gray-200 mt-10">
+                // Show no results message
+                <p className="text-center text-gray-500 mt-10">
                     No cars found matching "{search}"
                 </p>
             )}

@@ -34,7 +34,50 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"; // shadcn dialog import
+} from "@/components/ui/dialog";
+// 💡 Import the Skeleton component
+import { Skeleton } from "@/components/ui/skeleton";
+
+// --- Table Skeleton Component for Admin View ---
+const TableSkeleton = () => (
+  <TableBody>
+    {Array.from({ length: 5 }).map((_, index) => (
+      <TableRow key={index} className="animate-pulse">
+        {/* 16 TableCells to match the columns */}
+        {Array.from({ length: 16 }).map((_, cellIndex) => (
+          <TableCell key={cellIndex} className="py-4">
+            <Skeleton className="h-4 w-full" />
+          </TableCell>
+        ))}
+      </TableRow>
+    ))}
+  </TableBody>
+);
+// -----------------------------------------------
+
+// --- Card Skeleton Component for Non-Admin View (Re-used from previous chat) ---
+const CardSkeleton = () => (
+  <Card className="shadow-md transition-all w-[200px] md:w-[260px] rounded-lg overflow-hidden animate-pulse">
+    <CardHeader className="flex justify-between items-center p-2 flex-row">
+      {/* Title Skeleton */}
+      <Skeleton className="h-4 w-2/3" />
+      {/* Badge Skeleton */}
+      <Skeleton className="h-4 w-1/4" />
+    </CardHeader>
+    <CardContent className="flex flex-col items-center text-center space-y-1.5 p-2">
+      {/* Image Skeleton */}
+      <div className="flex justify-center h-[100px] w-full relative">
+        <Skeleton className="h-[100px] w-full rounded-md" />
+      </div>
+      {/* Content lines Skeleton */}
+      <Skeleton className="h-3 w-3/4" />
+      <Skeleton className="h-3 w-1/2" />
+      <Skeleton className="h-3 w-1/3" />
+      <Skeleton className="h-3 w-4/5" />
+    </CardContent>
+  </Card>
+);
+// ------------------------------------------------------------------------------
 
 
 export default function CarsPage() {
@@ -74,7 +117,8 @@ export default function CarsPage() {
     fetchCars();
   }, []);
 
-  // ✅ Memoized values — must always run before any conditional return
+  // ... (rest of the useMemo and handlers remain the same) ...
+
   const rentedCars = useMemo(() => cars.filter((c) => c.rented === true), [cars]);
 
   const groupedByMonth = useMemo(() => {
@@ -154,14 +198,49 @@ export default function CarsPage() {
     }
   };
 
-  // ✅ Loading Spinner
-  if (loading || checkingAdmin) {
+
+  // 🛑 REMOVING THE FULL-SCREEN LOADER BLOCK 🛑
+  // if (loading || checkingAdmin) {
+  //   return (
+  //     <div className="flex items-center justify-center min-h-[90vh]">
+  //       <Loader2 className="animate-spin h-8 w-8 text-gray-600" />
+  //     </div>
+  //   );
+  // }
+
+  // Use a loader only for the initial admin check, otherwise, show the skeleton for data fetching
+  if (checkingAdmin) {
     return (
-      <div className="flex items-center justify-center min-h-[90vh]">
-        <Loader2 className="animate-spin h-8 w-8 text-gray-600" />
+      <div
+        className="min-h-[88.8vh] bg-gray-100 p-6"
+        style={{
+          backgroundImage: "url('/car.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold text-white">Rented Cars 🚘</h1>
+          <div className="relative w-64">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Search by Car Number..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-8 bg-white"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pb-4">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <CardSkeleton key={index} />
+          ))}
+        </div>
       </div>
     );
   }
+
 
   // ✅ Non-admin view
   if (!isAdmin) {
@@ -196,7 +275,14 @@ export default function CarsPage() {
           </div>
         </div>
 
-        {filteredNonAdminCars.length > 0 ? (
+        {/* 💡 Show Card Skeletons while loading the non-admin view data */}
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pb-4">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <CardSkeleton key={index} />
+            ))}
+          </div>
+        ) : filteredNonAdminCars.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pb-4">
             {filteredNonAdminCars.map((car) => (
               <Card
@@ -283,6 +369,7 @@ export default function CarsPage() {
         <div className="overflow-y-auto max-h-[70vh]">
           <Table className="w-full">
             <TableHeader className="sticky top-0 bg-gray-100 z-10">
+              {/* FIX: Removed whitespace/line breaks inside TableRow */}
               <TableRow>
                 <TableHead>Model</TableHead>
                 <TableHead>Rego</TableHead>
@@ -291,7 +378,7 @@ export default function CarsPage() {
                 <TableHead>Week</TableHead>
                 <TableHead>Rent (Per Week)</TableHead>
                 <TableHead>Receipt</TableHead>
-                <TableHead>Receipt Image</TableHead> {/* 👈 new column */}
+                <TableHead>Receipt Image</TableHead>
                 <TableHead>Received</TableHead>
                 <TableHead>Expense</TableHead>
                 <TableHead>Profit</TableHead>
@@ -299,13 +386,16 @@ export default function CarsPage() {
                 <TableHead>Description</TableHead>
                 <TableHead>Rented Date</TableHead>
                 <TableHead>Car Number</TableHead>
-                <TableHead >Actions</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
 
-            <TableBody>
-              {filteredCars.length > 0 ? (
-                filteredCars.map((car) => (
+            {/* 💡 Conditional TableBody Rendering: Show Skeleton or Data */}
+            {loading ? (
+              <TableSkeleton />
+            ) : filteredCars.length > 0 ? (
+              <TableBody>
+                {filteredCars.map((car) => (
                   <TableRow key={car.id}>
                     <TableCell>{car.carModel ?? "-"}</TableCell>
                     <TableCell>{car.rego ?? "-"}</TableCell>
@@ -373,21 +463,26 @@ export default function CarsPage() {
                       </DropdownMenu>
                     </TableCell>
                   </TableRow>
-                ))
-              ) : (
+                ))}
+              </TableBody>
+            ) : (
+              <TableBody>
                 <TableRow>
                   <TableCell
-                    colSpan={15}
+                    colSpan={16}
                     className="text-center py-6 text-gray-500"
                   >
                     No cars found for Week {currentWeek} in {currentMonth}
                   </TableCell>
                 </TableRow>
-              )}
-            </TableBody>
+              </TableBody>
+            )}
           </Table>
         </div>
       </div>
+
+      {/* Pagination and Totals (Optional, not requested but often useful) */}
+      {/* ... */}
 
       {/* ✅ Dialog to show big image */}
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
@@ -405,7 +500,6 @@ export default function CarsPage() {
                 className="rounded-lg object-contain max-h-[70vh] max-w-full mx-auto"
               />
             </div>
-
           )}
         </DialogContent>
       </Dialog>
