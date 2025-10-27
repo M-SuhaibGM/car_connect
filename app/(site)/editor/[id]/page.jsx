@@ -58,7 +58,7 @@ export default function EditorPage() {
           driverName: car.driverName || "",
           rentPerWeek: car.rentPerWeek ?? "",
           receipt: car.receipt || "",
-          receiptImage: car.receiptImageUrl || "", // ✅ load existing image if any
+          receiptImageUrl: car.receiptImageUrl || "", // ✅ load existing image if any
           amountReceiver: car.amountReceiver ?? "",
           expense: car.expense ?? "",
           profit: car.profit ?? "",
