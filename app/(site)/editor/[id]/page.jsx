@@ -232,7 +232,7 @@ export default function EditorPage() {
             </div>
 
             {/* ✅ Receipt Image Upload */}
-            <div className="md:col-span-2">
+            <div className="flex flex-col items-center justify-center md:col-span-2">
               <Label>Receipt Image</Label>
               <UploadDropzone
                 endpoint="receiptImage"
@@ -250,17 +250,17 @@ export default function EditorPage() {
                 }}
                 appearance={{
                   container:
-                    "border-2 border-dashed border-gray-300 rounded-md p-6",
+                    "border-2 border-dashed border-gray-300 rounded-md p-4 w-56 h-40 flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition shadow-sm",
                   button:
-                    "bg-green-600 text-white px-4 py-2 rounded-md mt-2 hover:bg-green-700",
-                  allowedContent: "text-gray-500 text-sm mt-1",
+                    "bg-green-600 text-white px-4 py-4 text-sm rounded-md mt-2 hover:bg-green-700",
+                  allowedContent: "text-gray-500 text-xs mt-1 text-center",
                 }}
               />
               {formData.receiptImageUrl && (
                 <img
                   src={formData.receiptImageUrl}
                   alt="Receipt"
-                  className="mt-3 rounded-md w-40 h-28 object-cover border"
+                  className="mt-3 rounded-md w-48 h-32 object-cover border shadow-sm"
                 />
               )}
             </div>
@@ -357,7 +357,7 @@ export default function EditorPage() {
             </div>
 
             {/* Car Image */}
-            <div className="md:col-span-2">
+            <div className="flex flex-col items-center justify-center md:col-span-2">
               <Label>Car Image</Label>
               <UploadDropzone
                 endpoint="carImage"
@@ -375,21 +375,20 @@ export default function EditorPage() {
                 }}
                 appearance={{
                   container:
-                    "border-2 border-dashed border-gray-300 rounded-md p-6",
+                    "border-2 border-dashed border-gray-300 rounded-md p-4 w-56 h-40 flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition shadow-sm",
                   button:
-                    "bg-blue-600 text-white px-4 py-2 rounded-md mt-2 hover:bg-blue-700",
-                  allowedContent: "text-gray-500 text-sm mt-1",
+                    "bg-blue-600 text-white px-4 py-4 text-sm rounded-md mt-2 hover:bg-blue-700",
+                  allowedContent: "text-gray-500 text-xs mt-1 text-center",
                 }}
               />
               {formData.imageUrl && (
                 <img
                   src={formData.imageUrl}
                   alt="Car"
-                  className="mt-3 rounded-md w-40 h-28 object-cover border"
+                  className="mt-3 rounded-md w-48 h-32 object-cover border shadow-sm"
                 />
               )}
             </div>
-
             {/* Description */}
             <div className="md:col-span-2">
               <Label htmlFor="description">Description</Label>
