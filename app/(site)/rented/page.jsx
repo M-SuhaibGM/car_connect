@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Loader2, MoreHorizontal, Search } from "lucide-react";
+import { AlertTriangle, Loader2, MoreHorizontal, Search, TrendingDown, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -154,6 +154,31 @@ export default function CarsPage() {
       car.carNumber?.toLowerCase().includes(search.toLowerCase())
   );
 
+
+
+  // 💰 Monthly Totals (all weeks of currentMonth)
+  const monthlyTotals = useMemo(() => {
+    const monthCarsAllWeeks =
+      groupedByMonth.grouped[currentMonth] && months.length > 0
+        ? groupedByMonth.grouped[currentMonth]
+        : [];
+
+    const expense = monthCarsAllWeeks.reduce(
+      (acc, car) => acc + (Number(car.expense) || 0),
+      0
+    );
+    const profit = monthCarsAllWeeks.reduce(
+      (acc, car) => acc + (Number(car.profit) || 0),
+      0
+    );
+    const loss = monthCarsAllWeeks.reduce(
+      (acc, car) => acc + (Number(car.loss) || 0),
+      0
+    );
+
+    return { expense, profit, loss };
+  }, [groupedByMonth, currentMonth, months]);
+
   const totalExpense = filteredCars.reduce(
     (acc, car) => acc + (Number(car.expense) || 0),
     0
@@ -189,12 +214,43 @@ export default function CarsPage() {
 
   const handleDelete = async (id) => {
     try {
+      setLoading(true)
       await axios.delete(`/api/data/${id}`);
       setCars((prev) => prev.filter((car) => car.id !== id));
       toast.success("Car deleted successfully!");
     } catch (error) {
       console.error("Delete error:", error);
       toast.error("Failed to delete car.");
+    } finally {
+      setLoading(false)
+    }
+  };
+  const handleDuplicate = async (id) => {
+    try {
+      // 1️⃣ Fetch the existing car
+      setLoading(true)
+      const { data: existingCar } = await axios.get(`/api/data/${id}`);
+
+      // 2️⃣ Remove the existing ID and update createdAt
+      const newCarData = {
+        ...existingCar,
+        id: undefined, // Prisma will generate a new ID
+        createdAt: new Date(),
+      };
+
+      // 3️⃣ Create a new car entry
+      const { data: newCar } = await axios.post(`/api/data/${id}`, newCarData);
+
+      // 4️⃣ Redirect to the editor page for the new entry
+      router.push(`/editor/${newCar.id}/?page=rented`);
+
+      toast.success("Car duplicated successfully!");
+    } catch (error) {
+      console.error("Duplicate error:", error);
+      toast.error("Failed to duplicate car.");
+    }
+    finally {
+      setLoading(false)
     }
   };
 
@@ -505,6 +561,12 @@ export default function CarsPage() {
                           >
                             Delete
                           </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleDuplicate(car.id)}
+                          >
+                            Duplicate
+                          </DropdownMenuItem>
+
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -527,48 +589,116 @@ export default function CarsPage() {
         </div>
       </div>
 
-      {/* ✨ Totals Card (New) */}
-      <div className="mt-4 grid grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="p-4 flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Expense
-            </CardTitle>
-            <span className="text-red-500">🔻</span>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <div className="text-2xl font-bold text-red-600">
-              ${totalExpense.toFixed(2)}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="p-4 flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Profit
-            </CardTitle>
-            <span className="text-green-500">🟢</span>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <div className="text-2xl font-bold text-green-600">
-              ${totalProfit.toFixed(2)}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="p-4 flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Loss
-            </CardTitle>
-            <span className="text-red-500">🔴</span>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <div className="text-2xl font-bold text-red-600">
-              ${totalLoss.toFixed(2)}
-            </div>
-          </CardContent>
-        </Card>
+      {/* ✨ Totals Summary (Weekly + Monthly) */}
+      <div className="mt-6 space-y-6">
+        {/* WEEKLY TOTALS */}
+        <div>
+          <h3 className="text-sm font-semibold mb-2 text-white uppercase tracking-wide">
+            Weekly Totals
+          </h3>
+          <div className="grid grid-cols-3 gap-3">
+            <Button
+              variant="outline"
+              className="flex items-center justify-between bg-gray-900 text-white hover:bg-white transition-all p-4 rounded-xl"
+            >
+              <div className="flex items-center gap-2">
+                <span className="p-2 bg-red-500/20 rounded-full">
+                  <TrendingDown className="w-5 h-5 text-red-500" />
+                </span>
+                <span className="font-medium text-sm">Expense</span>
+              </div>
+              <span className="text-lg font-bold text-red-400">
+                ${totalExpense.toFixed(2)}
+              </span>
+            </Button>
+
+            <Button
+              variant="outline"
+              className="flex items-center justify-between bg-gray-900 text-white hover:bg-white transition-all p-4 rounded-xl"
+            >
+              <div className="flex items-center gap-2">
+                <span className="p-2 bg-green-500/20 rounded-full">
+                  <TrendingUp className="w-5 h-5 text-green-500" />
+                </span>
+                <span className="font-medium text-sm">Profit</span>
+              </div>
+              <span className="text-lg font-bold text-green-400">
+                ${totalProfit.toFixed(2)}
+              </span>
+            </Button>
+
+            <Button
+              variant="outline"
+              className="flex items-center justify-between bg-gray-900 text-white hover:bg-white transition-all p-4 rounded-xl"
+            >
+              <div className="flex items-center gap-2">
+                <span className="p-2 bg-yellow-500/20 rounded-full">
+                  <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                </span>
+                <span className="font-medium text-sm">Loss</span>
+              </div>
+              <span className="text-lg font-bold text-yellow-400">
+                ${totalLoss.toFixed(2)}
+              </span>
+            </Button>
+          </div>
+        </div>
+
+        {/* MONTHLY TOTALS */}
+        <div>
+          <h3 className="text-sm font-semibold mb-2 text-white uppercase tracking-wide">
+            Monthly Totals
+          </h3>
+          <div className="grid grid-cols-3 gap-3">
+            <Button
+              variant="outline"
+              className="flex items-center justify-between bg-gray-900 text-white hover:bg-white transition-all p-4 rounded-xl"
+            >
+              <div className="flex items-center gap-2">
+                <span className="p-2 bg-red-500/20 rounded-full">
+                  <TrendingDown className="w-5 h-5 text-red-500" />
+                </span>
+                <span className="font-medium text-sm">Expense</span>
+              </div>
+              <span className="text-lg font-bold text-red-400">
+                ${monthlyTotals.expense.toFixed(2)}
+              </span>
+            </Button>
+
+            <Button
+              variant="outline"
+              className="flex items-center justify-between bg-gray-900 text-white hover:bg-white transition-all p-4 rounded-xl"
+            >
+              <div className="flex items-center gap-2">
+                <span className="p-2 bg-green-500/20 rounded-full">
+                  <TrendingUp className="w-5 h-5 text-green-500" />
+                </span>
+                <span className="font-medium text-sm">Profit</span>
+              </div>
+              <span className="text-lg font-bold text-green-400">
+                ${monthlyTotals.profit.toFixed(2)}
+              </span>
+            </Button>
+
+            <Button
+              variant="outline"
+              className="flex items-center justify-between bg-gray-900 text-white hover:bg-white transition-all p-4 rounded-xl"
+            >
+              <div className="flex items-center gap-2">
+                <span className="p-2 bg-yellow-500/20 rounded-full">
+                  <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                </span>
+                <span className="font-medium text-sm">Loss</span>
+              </div>
+              <span className="text-lg font-bold text-yellow-400">
+                ${monthlyTotals.loss.toFixed(2)}
+              </span>
+            </Button>
+          </div>
+        </div>
       </div>
+
+
       {/* --- */}
 
 

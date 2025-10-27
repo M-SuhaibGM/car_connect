@@ -68,7 +68,7 @@ export async function PUT(req, { params }) {
         profit: body.profit,
         loss: body.loss,
         receiptImageUrl: body.receiptImageUrl
-        
+
       },
     });
 
@@ -101,5 +101,28 @@ export async function DELETE(req, { params }) {
   } catch (error) {
     console.error("DELETE error:", error);
     return NextResponse.json({ error: "Failed to delete car" }, { status: 500 });
+  }
+}
+
+export async function POST(req) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL; // 👈 admin email from .env
+
+    if (!session || session.user?.email !== adminEmail) {
+      return NextResponse.json(
+        { success: false, error: "Access denied: Admins only" },
+        { status: 403 }
+      );
+    }
+    const body = await req.json();
+    const newCar = await prisma.car.create({
+      data: body,
+    });
+    return NextResponse.json(newCar);
+  } catch (error) {
+    console.error("Error creating car:", error);
+    return NextResponse.json({ error: "Failed to create car" }, { status: 500 });
   }
 }
