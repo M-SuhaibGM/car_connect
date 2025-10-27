@@ -332,6 +332,8 @@ export default function CarsPage() {
     );
   }
 
+  // ... (imports and component logic remain the same) ...
+
   // ✅ Admin Table View
   return (
     <div
@@ -364,10 +366,55 @@ export default function CarsPage() {
         </div>
       </div>
 
+      {/* ✨ Navigation and Totals Area (New/Updated) */}
+      <div className="flex justify-between items-center mb-4">
+        {/* Month Navigation */}
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            onClick={handlePrevMonth}
+            disabled={currentMonthIndex === months.length - 1} // Disable if at the newest month
+            className="bg-white/80 backdrop-blur-sm"
+          >
+            Prev Month
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleNextMonth}
+            disabled={currentMonthIndex === 0} // Disable if at the oldest month
+            className="bg-white/80 backdrop-blur-sm"
+          >
+            Next Month
+          </Button>
+        </div>
+
+        {/* Week Navigation */}
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            onClick={handlePrevWeek}
+            disabled={currentWeek === 1}
+            className="bg-white/80 backdrop-blur-sm"
+          >
+            Prev Week
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleNextWeek}
+            disabled={currentWeek === 4}
+            className="bg-white/80 backdrop-blur-sm"
+          >
+            Next Week
+          </Button>
+        </div>
+      </div>
+      {/* --- */}
+
       {/* Table */}
       <div className="flex-1 bg-white shadow-lg rounded-lg max-h-[70vh] overflow-hidden">
         <div className="overflow-y-auto max-h-[70vh]">
           <Table className="w-full">
+            {/* ... (TableHeader and TableBody remain the same) ... */}
             <TableHeader className="sticky top-0 bg-gray-100 z-10">
               {/* FIX: Removed whitespace/line breaks inside TableRow */}
               <TableRow>
@@ -419,7 +466,6 @@ export default function CarsPage() {
                             height={50}
                             className="rounded-md object-cover border w-[50px] h-[50px] mx-auto"
                           />
-
                         </button>
                       ) : (
                         <span className="text-gray-400 text-sm">No Image</span>
@@ -481,10 +527,52 @@ export default function CarsPage() {
         </div>
       </div>
 
-      {/* Pagination and Totals (Optional, not requested but often useful) */}
-      {/* ... */}
+      {/* ✨ Totals Card (New) */}
+      <div className="mt-4 grid grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="p-4 flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Expense
+            </CardTitle>
+            <span className="text-red-500">🔻</span>
+          </CardHeader>
+          <CardContent className="p-4 pt-0">
+            <div className="text-2xl font-bold text-red-600">
+              ${totalExpense.toFixed(2)}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="p-4 flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Profit
+            </CardTitle>
+            <span className="text-green-500">🟢</span>
+          </CardHeader>
+          <CardContent className="p-4 pt-0">
+            <div className="text-2xl font-bold text-green-600">
+              ${totalProfit.toFixed(2)}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="p-4 flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Loss
+            </CardTitle>
+            <span className="text-red-500">🔴</span>
+          </CardHeader>
+          <CardContent className="p-4 pt-0">
+            <div className="text-2xl font-bold text-red-600">
+              ${totalLoss.toFixed(2)}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      {/* --- */}
 
-      {/* ✅ Dialog to show big image */}
+
+      {/* ✅ Dialog to show big image (remains the same) */}
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
         <DialogContent className="max-w-2xl w-[90vw]">
           <DialogHeader>
