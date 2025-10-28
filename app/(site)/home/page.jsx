@@ -46,7 +46,19 @@ export default function LandingPage() {
   // 💡 Add a new state for the initial data fetching status
   const [isFetchingReviews, setIsFetchingReviews] = useState(true);
   const router = useRouter();
+  const [expanded, setExpanded] = useState({});
 
+  const toggleExpand = (id) => {
+    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  // Helper: truncate description
+  const truncateText = (text, wordLimit = 20) => {
+    const words = text.split(" ");
+    return words.length > wordLimit
+      ? words.slice(0, wordLimit).join(" ") + "..."
+      : text;
+  };
   // ✅ Fetch all reviews
   useEffect(() => {
     const fetchReviews = async () => {
@@ -155,7 +167,7 @@ export default function LandingPage() {
         </h3>
 
         <div className="overflow-x-auto no-scrollbar px-6">
-          <div className="flex gap-6 w-max">
+          <div className="flex  flex-wrap justify-center gap-6  w-full">
             {/* 💡 Conditional rendering for loading, no reviews, or reviews */}
             {isFetchingReviews ? (
               // Show two skeleton cards while fetching
@@ -165,51 +177,74 @@ export default function LandingPage() {
               </>
             ) : reviews.length > 0 ? (
               // Show actual reviews when available
-              reviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="flex flex-col md:flex-row items-center md:items-start gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 w-[350px] md:w-[500px] p-6"
-                >
-                  {/* Profile + Info */}
-                  <div className="flex flex-col items-center md:items-start text-center md:text-left flex-shrink-0">
-                    <Image
-                      src={review.driverImageUrl || "/driver.jpg"}
-                      alt={review.driverName || "Driver"}
-                      width={70}
-                      height={70}
-                      className="rounded-full object-cover mb-2"
-                    />
-                    <h4 className="font-semibold text-gray-800">
-                      {review.driverName || "Anonymous"}
-                    </h4>
-                    <p className="text-xs text-gray-500">
-                      {new Date(review.createdAt).toLocaleDateString()}
-                    </p>
-                    <div className="flex justify-center md:justify-start text-yellow-400 mt-1">
-                      {Array.from({ length: review.rating || 0 }).map((_, i) => (
-                        <Star key={i} size={16} fill="currentColor" />
-                      ))}
-                    </div>
-                  </div>
+              <div className="">
+                {reviews.map((review) => {
+                  const isExpanded = expanded[review.id];
+                  const description = review.description || "No description provided.";
+                  const displayText = isExpanded ? description : truncateText(description);
 
-                  {/* Review Content */}
-                  <div className="flex-1">
-                    {review.carImageUrl && (
-                      <div className="flex justify-center h-[180px] w-full relative ">
+                  return (
+                    <div
+                      key={review.id}
+                      className="flex flex-col md:flex-row  w-screen pb-3 items-center justify-between md:items-start gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300   p-6"
+                    >
+                      {/* Profile + Info */}
+                      <div className="flex flex-col items-center md:items-start text-center md:text-left flex-shrink-0">
                         <Image
-                          src={review.carImageUrl}
-                          alt="Car"
-                          fill
-                          className="absolute object-cover rounded-md"
+                          src={review.driverImageUrl || "/driver.jpg"}
+                          alt={review.driverName || "Driver"}
+                          width={70}
+                          height={70}
+                          className="rounded-full w-full object-cover mb-2"
                         />
+                        <h4 className="font-semibold text-gray-800">
+                          {review.driverName || "Anonymous"}
+                        </h4>
+                        <p className="text-xs text-gray-500">
+                          {new Date(review.createdAt).toLocaleDateString()}
+                        </p>
+                        <div className="flex justify-center md:justify-start text-yellow-400 mt-1">
+                          {Array.from({ length: review.rating || 0 }).map((_, i) => (
+                            <Star key={i} size={16} fill="currentColor" />
+                          ))}
+                        </div>
                       </div>
-                    )}
-                    <p className="text-gray-700 text-sm italic">
-                      “{review.description || "No description provided."}”
-                    </p>
-                  </div>
-                </div>
-              ))
+
+
+                      {/* Review Content */}
+                      <div className="flex-1 flex flex-col items-center md:items-start">
+
+                        <div className="justify-end ">
+                          {review.carImageUrl && (
+                            <div className="relative w-[200px] h-[180px] mb-3">
+                              <Image
+                                src={review.carImageUrl}
+                                alt="Car"
+                                fill
+                                className="object-cover rounded-md"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-gray-700 text-sm italic text-center md:text-left">
+                          “{displayText}”
+                        </p>
+
+                        {/* Show more / Hide toggle */}
+                        {description.split(" ").length > 20 && (
+                          <button
+                            onClick={() => toggleExpand(review.id)}
+                            className="text-blue-500 text-xs mt-1 hover:underline"
+                          >
+                            {isExpanded ? "Hide" : "Show more"}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
             ) : (
               // Show 'No reviews yet' message if fetching is complete and no reviews exist
               <p className="text-center text-gray-600 w-full">No reviews yet.</p>

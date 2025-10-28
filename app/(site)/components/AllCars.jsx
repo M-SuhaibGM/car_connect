@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import {  MoreHorizontal, Search } from "lucide-react";
+import { MoreHorizontal, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -99,7 +99,7 @@ export default function AllCars() {
             {/* 🔍 Header */}
             <div className="flex items-center justify-between mb-6">
                 {/* NOTE: You used 'text-white' here, which might only work if the parent div has a dark background. Assuming it's meant to be visible. */}
-                <h1 className="text-3xl font-bold text-white">All Cars 🚗</h1> 
+                <h1 className="text-3xl font-bold text-white">All Cars 🚗</h1>
                 <div className="relative w-64">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
                     <Input
@@ -122,11 +122,11 @@ export default function AllCars() {
                 </div>
             ) : filteredCars.length > 0 ? (
                 // Show actual data
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {filteredCars.map((car) => (
                         <Card
                             key={car.id}
-                            className="shadow-md hover:shadow-xl transition-all relative overflow-hidden w-full max-w-xs mx-auto h-[280px]"
+                            className="shadow-md hover:shadow-xl transition-all relative overflow-hidden w-full max-w-sm mx-auto"
                         >
                             {/* 🔴 Rented Label */}
                             {car.rented && (
@@ -162,20 +162,20 @@ export default function AllCars() {
                                 </DropdownMenu>
                             </CardHeader>
 
-                            {/* 🧱 Two-column content */}
-                            <CardContent className="grid grid-cols-2 gap-2 px-4 pb-4 items-center">
-                                {/* 🖼️ Left: Image */}
-                                <div className="flex justify-center h-[100px] w-[130px] relative ">
+                            {/* 🧱 Responsive layout inside card */}
+                            <CardContent className="flex flex-col sm:flex-row items-center sm:items-start gap-3 px-4 pb-4">
+                                {/* 🖼️ Car Image */}
+                                <div className="relative w-full sm:w-[45%] h-[140px] sm:h-[120px] md:h-[150px] rounded-md overflow-hidden">
                                     <Image
                                         src={car?.imageUrl || "/car.jpg"}
                                         alt="Car"
                                         fill
-                                        className="absolute object-cover rounded-md"
+                                        className="object-cover"
                                     />
                                 </div>
 
-                                {/* 📋 Right: Car Details */}
-                                <div className="space-y-1 text-sm">
+                                {/* 📋 Car Details */}
+                                <div className="flex-1 text-sm space-y-1 w-full sm:w-[55%]">
                                     <p>
                                         <strong>No:</strong> {car.carNumber ?? "-"}
                                     </p>
@@ -189,23 +189,23 @@ export default function AllCars() {
                                         <strong>Desc:</strong> {car.description ?? "-"}
                                     </p>
                                 </div>
-
-                                {/* 🧍 Driver Info if rented */}
-                                {car.rented && (
-                                    <div className="col-span-2 mt-2 bg-gray-100 p-2 rounded text-xs text-gray-800">
-                                        <p>
-                                            <strong>Driver:</strong> {car.driverName ?? "Unknown"}
-                                        </p>
-                                        <p>
-                                            <strong>Rented Date:</strong>{" "}
-                                            {car.rentedDate}
-                                        </p>
-                                    </div>
-                                )}
                             </CardContent>
+
+                            {/* 🧍 Driver Info if rented */}
+                            {car.rented && (
+                                <div className="bg-gray-100 border-t border-gray-200 px-4 py-2 text-xs text-gray-700">
+                                    <p>
+                                        <strong>Driver:</strong> {car.driverName ?? "Unknown"}
+                                    </p>
+                                    <p>
+                                        <strong>Rented Date:</strong> {car.rentedDate}
+                                    </p>
+                                </div>
+                            )}
                         </Card>
                     ))}
                 </div>
+
             ) : (
                 // Show no results message
                 <p className="text-center text-gray-500 mt-10">
