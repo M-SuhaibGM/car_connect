@@ -37,10 +37,10 @@ const Navbar = () => {
   // 🧠 Show skeleton while session is loading
   if (status === "loading") {
     return (
-      <nav className="bg-gray-300 shadow-md">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold text-blue-600">
-            NexaRent
+      <nav className="bg-gray-300 shadow-md max-h-[72px]">
+        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+          <Link href="/" >
+            <Image src="/logo.svg" alt="logo" height={100} width={100} />
           </Link>
 
           {/* Links Skeleton */}
@@ -66,12 +66,13 @@ const Navbar = () => {
 
   return (
     <nav className="bg-gray-300 shadow-md max-h-[72px]">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-6  flex justify-between items-center">
         {/* Logo */}
-        <Link href="/" className="text-2xl font-bold text-blue-600">
-          NexaRent
-        </Link>
-
+        <div className="">
+          <Link href="/" >
+            <Image src="/logo.svg" alt="logo" height={100} width={100} />
+          </Link>
+        </div>
         {/* Navigation Links */}
         <ul className="flex space-x-6 text-gray-700 font-medium transition-all">
           {linksToRender.map(({ href, label }) => (

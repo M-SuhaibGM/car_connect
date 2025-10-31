@@ -2,38 +2,54 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Phone, Pencil, Star } from "lucide-react";
+import { Mail, Phone, Pencil, Star, Instagram, Facebook } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import axios from "axios";
-
-// 💡 Import the Skeleton component
 import { Skeleton } from "@/components/ui/skeleton";
 
-// --- Skeleton Card Component ---
 const ReviewCardSkeleton = () => (
-  <div className="flex flex-col md:flex-row items-center md:items-start gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm w-[350px] md:w-[500px] p-6 animate-pulse">
-    {/* Profile + Info Skeleton */}
-    <div className="flex flex-col items-center md:items-start text-center md:text-left flex-shrink-0">
-      <Skeleton className="h-[70px] w-[70px] rounded-full mb-2" />
-      <Skeleton className="h-4 w-20 mb-1" />
-      <Skeleton className="h-3 w-16" />
-      <div className="flex justify-center md:justify-start text-yellow-400 mt-1">
-        {/* Five stars for rating placeholder */}
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Star key={i} size={16} fill="currentColor" className="opacity-50" />
-        ))}
-      </div>
+  // 1. Main Card Wrapper: Match flex layout, gap, padding, and w-[80vw] width
+  <div
+    className="flex flex-col md:flex-row w-[80vw] items-center justify-between md:items-start gap-4 
+             bg-white border border-gray-200 rounded-2xl shadow-sm p-6 animate-pulse"
+  >
+
+    {/* 2. Profile + Info Skeleton (Left Section) */}
+    <div className="flex flex-col items-center justify-center md:items-start text-center md:text-left flex-shrink-0">
+
+      {/* Driver Image Placeholder: Match original w-120 h-120 */}
+      <Skeleton className="h-[120px] w-[120px] rounded-full border-2 mb-2" />
+
+      {/* Driver Name Placeholder */}
+      <Skeleton className="h-4 w-28 mb-1" />
+
+      {/* Date Placeholder: Smaller font size */}
+      <Skeleton className="h-3 w-20 text-xs" />
+
+      {/* Rating Stars Placeholder: Match the height/width of 5 small stars */}
+      <Skeleton className="h-3 w-16 mt-1" />
     </div>
 
-    {/* Review Content Skeleton */}
-    <div className="flex-1 w-full">
-      <Skeleton className="h-[180px] w-full rounded-lg mb-3" />
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-[90%]" />
+    {/* 3. Review Content Skeleton (Middle Section - Flex-1 takes available space) */}
+    <div className="flex-1 flex flex-col items-center justify-center md:items-start w-full">
+
+      {/* Text Block Placeholder - Mimics the italic review text lines */}
+      <div className="w-full mt-3 space-y-2">
+        <Skeleton className="h-3 w-full" />
+        <Skeleton className="h-3 w-11/12" />
+        <Skeleton className="h-3 w-10/12" />
       </div>
+
+      {/* Show more / Hide toggle Placeholder (small blue button) */}
+      <Skeleton className="h-3 w-20 bg-blue-200 mt-2" />
+    </div>
+
+    {/* 4. Car Image Skeleton (Right Section - Optional, but present in structure) */}
+    {/* Match the relative w-[250px] h-[130px] dimensions */}
+    <div className="flex-shrink-0">
+      <Skeleton className="w-[250px] h-[130px] rounded-md mb-3" />
     </div>
   </div>
 );
@@ -186,46 +202,40 @@ export default function LandingPage() {
                   return (
                     <div
                       key={review.id}
-                      className="flex flex-col md:flex-row  w-screen pb-3 items-center justify-between md:items-start gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300   p-6"
+                      className="flex flex-col md:flex-row  w-[80vw] my-2 items-center justify-between md:items-start gap-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300   p-6"
                     >
                       {/* Profile + Info */}
-                      <div className="flex flex-col items-center md:items-start text-center md:text-left flex-shrink-0">
+                      <div className="flex  items-center justify-center md:items-start text-center md:text-left flex-shrink-0">
+
                         <Image
                           src={review.driverImageUrl || "/driver.jpg"}
                           alt={review.driverName || "Driver"}
-                          width={70}
-                          height={70}
-                          className="rounded-full w-full object-cover mb-2"
+                          width={120}
+                          height={120}
+                          className="rounded-full border-2 w-full object-cover mb-2"
                         />
-                        <h4 className="font-semibold text-gray-800">
-                          {review.driverName || "Anonymous"}
-                        </h4>
-                        <p className="text-xs text-gray-500">
-                          {new Date(review.createdAt).toLocaleDateString()}
-                        </p>
-                        <div className="flex justify-center md:justify-start text-yellow-400 mt-1">
-                          {Array.from({ length: review.rating || 0 }).map((_, i) => (
-                            <Star key={i} size={16} fill="currentColor" />
-                          ))}
-                        </div>
                       </div>
 
 
-                      {/* Review Content */}
-                      <div className="flex-1 flex flex-col items-center md:items-start">
 
-                        <div className="justify-end ">
-                          {review.carImageUrl && (
-                            <div className="relative w-[200px] h-[180px] mb-3">
-                              <Image
-                                src={review.carImageUrl}
-                                alt="Car"
-                                fill
-                                className="object-cover rounded-md"
-                              />
-                            </div>
-                          )}
+                      {/* Review Content */}
+                      <div className="flex-1 flex flex-col items-center justify-center md:items-start">
+
+                        <div className="flex flex-col items-center md:items-start text-center md:text-left flex-shrink-0">
+
+                          <h4 className="font-semibold text-gray-800">
+                            {review.driverName || "Anonymous"}
+                          </h4>
+                          <p className="text-xs text-gray-500">
+                            {new Date(review.createdAt).toLocaleDateString()}
+                          </p>
+                          <div className="flex justify-center md:justify-start text-yellow-400 mt-1">
+                            {Array.from({ length: review.rating || 0 }).map((_, i) => (
+                              <Star key={i} size={16} fill="currentColor" />
+                            ))}
+                          </div>
                         </div>
+
                         <p className="text-gray-700 text-sm italic text-center md:text-left">
                           “{displayText}”
                         </p>
@@ -238,6 +248,19 @@ export default function LandingPage() {
                           >
                             {isExpanded ? "Hide" : "Show more"}
                           </button>
+                        )}
+                      </div>
+
+                      <div >
+                        {review.carImageUrl && (
+                          <div className="relative w-[250px] h-[130px] mb-3">
+                            <Image
+                              src={review.carImageUrl}
+                              alt="Car"
+                              fill
+                              className="object-cover rounded-md"
+                            />
+                          </div>
                         )}
                       </div>
                     </div>
@@ -254,6 +277,9 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
+
+
+
       <footer className="bg-gray-500 text-white py-6">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-6">
           <p className="text-gray-100 mb-4 md:mb-0">
@@ -261,6 +287,7 @@ export default function LandingPage() {
           </p>
 
           <div className="flex space-x-6 items-center">
+            {/* Existing Contact Links */}
             <a
               href="https://wa.me/923256800084"
               target="_blank"
@@ -275,7 +302,25 @@ export default function LandingPage() {
               className="flex items-center space-x-2 hover:text-red-400"
             >
               <Mail className="w-5 h-5" />
-              <span>Majidsaleem884@gmail.com</span>
+              <span>nexarenttechpty@gmail.com</span>
+            </a>
+
+            {/* New Social Media Links */}
+            <a
+              href="https://www.instagram.com/nexarenttech?igsh=ZWZnM2h5NnNwOW5s"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-pink-500" // Instagram color hint
+            >
+              <Instagram className="w-5 h-5" />
+            </a>
+            <a
+              href="https://www.facebook.com/share/1FoKisDJqo/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-blue-600" // Facebook color hint
+            >
+              <Facebook className="w-5 h-5" />
             </a>
           </div>
         </div>
